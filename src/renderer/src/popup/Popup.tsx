@@ -1,8 +1,7 @@
 import { motion } from "framer-motion";
 import { Coffee, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { mockDay } from "@shared/mock";
-import type { ActionLogEntry, PopupKind, PreflightPlan, Risk } from "@shared/types";
+import type { ActionLogEntry, DayBlock, DayPlanResult, PopupKind, PreflightPlan, Risk } from "@shared/types";
 import { reveal } from "../motion/primitives";
 
 const riskLabel: Record<Risk, string> = { auto: "auto", confirm: "1 clic", ask: "demande" };
@@ -35,7 +34,49 @@ export function Popup({ kind }: { kind: PopupKind }) {
 
 function Morning() {
   const [text, setText] = useState("");
-  const calendar = mockDay.filter((b) => b.source === "calendar" && b.kind !== "free");
+  const [calendar, setCalendar] = useState<DayBlock[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState<DayPlanResult | null>(null);
+
+  useEffect(() => {
+    window.api.day().then((d) => setCalendar(d.filter((b) => b.source === "calendar" && b.kind === "meeting")));
+  }, []);
+
+  const submit = async () => {
+    if (!text.trim()) return;
+    setBusy(true);
+    setResult(await window.api.planDay(text));
+    setBusy(false);
+  };
+
+  if (result)
+    return (
+      <>
+        <div>
+          <p className="eyebrow">Brief du matin · {result.source === "llm" ? `IA · ${(result.latencyMs / 1000).toFixed(1)} s` : "plan simple"}</p>
+          <h2>Ta journée est prête.</h2>
+          <p className="microcopy">{result.summary}</p>
+        </div>
+        <div className="mini-blocks">
+          {[...calendar, ...result.blocks].sort((a, b) => a.start.localeCompare(b.start)).map((b) => (
+            <motion.div key={b.id} {...reveal(0.05)}>
+              <time>{b.start}</time>
+              <span>
+                {b.source === "morning" ? <strong>{b.title}</strong> : b.title}
+                {b.apps.length ? <span className="microcopy"> · {b.apps.join(", ")}</span> : null}
+              </span>
+            </motion.div>
+          ))}
+        </div>
+        {result.error ? <p className="microcopy">IA indisponible ({result.error.slice(0, 80)}), plan simple utilisé.</p> : null}
+        <p className="microcopy">Je préparerai ton Mac 5 min avant chaque bloc.</p>
+        <div className="popup-footer">
+          <button className="mode-toggle" onClick={() => setResult(null)}>Modifier</button>
+          <button className="run-button" onClick={() => window.api.closePopup()}>C'est parti</button>
+        </div>
+      </>
+    );
+
   return (
     <>
       <div>
@@ -50,12 +91,13 @@ function Morning() {
       <div className="dashed" />
       <div>
         <p className="microcopy" style={{ marginBottom: 8 }}>Qu'est-ce que tu fais aujourd'hui en plus de ces meetings ? Une phrase suffit.</p>
-        <textarea autoFocus value={text} onChange={(e) => setText(e.target.value)}
+        <textarea autoFocus value={text} onChange={(e) => setText(e.target.value)} disabled={busy}
+          onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) void submit(); }}
           placeholder="Ex. finir le rapport Q4 cet après-midi, faire ma note de frais" />
       </div>
       <div className="popup-footer">
-        <button className="mode-toggle" onClick={() => window.api.closePopup()}>Plus tard</button>
-        <button className="run-button" onClick={() => window.api.popupAnswer("morning", { text })}>Préparer ma journée</button>
+        <button className="mode-toggle" onClick={() => window.api.closePopup()} disabled={busy}>Plus tard</button>
+        <button className="run-button" onClick={submit} disabled={busy || !text.trim()}>{busy ? "Je prépare…" : "Préparer ma journée"}</button>
       </div>
     </>
   );

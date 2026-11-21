@@ -17,8 +17,8 @@ import { EASE } from "./motion/primitives";
 
 export const NODE_W = 210;
 export const NODE_H = 84;
-const GAP_X = 150;
-const GAP_Y = 26;
+const GAP_X = 70; // Preflight : colonnes plus serrées que dans Contagion (3 colonnes + panneau à droite)
+const GAP_Y = 14;
 export const COL_W = NODE_W + GAP_X;
 const ROW_H = NODE_H + GAP_Y;
 export const STEP = 0.65; // seconds between two columns of the shock

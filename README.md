@@ -1,5 +1,7 @@
 # Preflight — LauzHack 2026 · challenge Nexthink
 
+> Objectif et avancement : [PROJET.md](PROJET.md) · Comment ça marche : [ARCHITECTURE.md](ARCHITECTURE.md)
+
 Un agent IT qui prépare ta journée : il lit ton calendrier, te demande le matin ce que tu fais en plus,
 prépare ton Mac 5 min avant chaque bloc (en demandant avant d'agir) et place la maintenance dans tes créneaux libres.
 

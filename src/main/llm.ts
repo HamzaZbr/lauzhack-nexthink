@@ -6,7 +6,7 @@ import type { LlmPingResult } from "../shared/types";
 
 const ENDPOINT = "https://api.together.ai/v1/chat/completions";
 
-export const model = () => process.env.TOGETHER_MODEL || "zai-org/GLM-5.1";
+export const model = () => process.env.TOGETHER_MODEL || "zai-org/GLM-5.3-Flash";
 export const hasKey = () => Boolean(process.env.TOGETHER_API_KEY);
 
 export interface ChatJsonOptions {
@@ -38,7 +38,12 @@ export async function chatJSON<T>({ system, user, schemaName, schema, timeoutMs 
         response_format: { type: "json_schema", json_schema: { name: schemaName, schema } },
       }),
     });
-    if (!res.ok) throw new Error(`Together ${res.status}: ${(await res.text()).slice(0, 300)}`);
+    if (!res.ok) {
+      const text = await res.text();
+      if (text.includes("non-serverless"))
+        throw new Error(`Le modèle ${model()} n'est pas « serverless » sur ta clé. Mets par ex. TOGETHER_MODEL=zai-org/GLM-5.3-Flash dans .env.`);
+      throw new Error(`Together ${res.status}: ${text.slice(0, 300)}`);
+    }
     const body = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
     const content = body.choices?.[0]?.message?.content ?? "";
     // Certains modèles entourent quand même le JSON de ```json … ``` ou d'un bloc <think>.

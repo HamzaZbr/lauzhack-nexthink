@@ -3,7 +3,7 @@
  * quand le LLM sera branché (bloc 1), il choisira parmi ces mêmes outils, et si l'appel
  * échoue ou dépasse le délai, c'est ce plan qui s'affiche.
  */
-import { mockDay } from "../shared/mock";
+import { getDay } from "./day";
 import { appMatches, isProtected } from "../shared/apps";
 import { riskOf } from "./actions";
 import { takeSnapshot } from "./sensors";
@@ -11,7 +11,8 @@ import type { ActionRequest, DayBlock, PreflightPlan, ProposedAction } from "../
 
 /** Prochain bloc « meeting » de la journée (pour l'instant : les données de démo). */
 export function nextBlock(): DayBlock {
-  return mockDay.find((b) => b.kind === "meeting") ?? mockDay[0];
+  const day = getDay();
+  return day.find((b) => b.kind === "meeting") ?? day[0];
 }
 
 const HEAVY_MB = 500;
@@ -61,7 +62,7 @@ export async function planPreflight(): Promise<PreflightPlan> {
     .forEach((w) => add({ tool: "open_app", target: w === "Teams" ? "Microsoft Teams" : w }, `Nécessaire pour « ${block.title} ».`));
 
   // 6. Mise à jour système (démo) : jamais pendant un meeting, proposée pour le prochain créneau libre
-  const free = mockDay.find((b) => b.kind === "free");
+  const free = getDay().find((b) => b.kind === "free");
   if (free)
     add(
       { tool: "install_update", target: `Mise à jour macOS à ${free.start}` },

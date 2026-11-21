@@ -1,16 +1,24 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Coffee } from "lucide-react";
-import { mockDay } from "@shared/mock";
+import { useEffect, useState } from "react";
+import type { DayBlock } from "@shared/types";
 import { reveal } from "../motion/primitives";
 
 const kindLabel = { meeting: "Meeting", focus: "Tâche", free: "Libre" } as const;
 
 export function Today() {
-  const nextId = mockDay.find((b) => b.kind === "meeting")?.id;
+  const [day, setDay] = useState<DayBlock[]>([]);
+  useEffect(() => {
+    window.api.day().then(setDay);
+    return window.api.onEvent((e) => {
+      if (e.type === "day-updated") setDay(e.payload as DayBlock[]);
+    });
+  }, []);
+  const nextId = day.find((b) => b.kind === "meeting")?.id;
   return (
     <div className="page-stack">
       <section className="timeline">
-        {mockDay.map((block, i) => (
+        {day.map((block, i) => (
           <motion.div key={block.id} className="timeline-row" data-kind={block.kind} data-next={block.id === nextId} {...reveal(0.04 * i)}>
             <time>{block.start} – {block.end}</time>
             <div>

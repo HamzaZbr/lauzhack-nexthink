@@ -54,7 +54,8 @@ const POPUP_SIZE: Record<PopupKind, { width: number; height: number }> = {
 export function openPopup(kind: PopupKind) {
   if (popup && !popup.isDestroyed()) popup.close();
   const { width, height } = POPUP_SIZE[kind];
-  const area = screen.getPrimaryDisplay().workArea;
+  // Sur l'écran où se trouve la souris (utile avec un écran externe).
+  const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea;
   popup = new BrowserWindow({
     width,
     height,

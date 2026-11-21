@@ -10,6 +10,8 @@ import { closePopup, openPopup, showDashboard, toDashboard } from "./windows";
 import { catalog, getJournal, initJournal, runActions, undo } from "./actions";
 import { planPreflight } from "./planner";
 import { takeSnapshot } from "./sensors";
+import { getDay, onDayChange } from "./day";
+import { planDay } from "./agent";
 import type { ActionRequest, PopupKind } from "../shared/types";
 
 loadEnv({ path: join(app.getAppPath(), ".env") });
@@ -52,10 +54,13 @@ function registerIpc() {
   ipcMain.handle("actions:run", (_e, requests: ActionRequest[]) => runActions(requests));
   ipcMain.handle("actions:undo", (_e, id: string) => undo(id));
   ipcMain.handle("journal:list", () => getJournal());
+  ipcMain.handle("day:get", () => getDay());
+  ipcMain.handle("day:plan", (_e, text: string) => planDay(String(text ?? "").slice(0, 500)));
 }
 
 app.whenReady().then(() => {
   initJournal((journal) => toDashboard("journal-updated", journal));
+  onDayChange((day) => toDashboard("day-updated", day));
   registerIpc();
   createTray();
   showDashboard();

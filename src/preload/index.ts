@@ -14,6 +14,8 @@ const api: PreflightApi = {
   runActions: (requests: ActionRequest[]) => ipcRenderer.invoke("actions:run", requests),
   undo: (id: string) => ipcRenderer.invoke("actions:undo", id),
   journal: () => ipcRenderer.invoke("journal:list"),
+  day: () => ipcRenderer.invoke("day:get"),
+  planDay: (text: string) => ipcRenderer.invoke("day:plan", text),
   onEvent: (cb) => {
     const listener = (_e: unknown, event: { type: string; payload?: unknown }) => cb(event);
     ipcRenderer.on("event", listener);

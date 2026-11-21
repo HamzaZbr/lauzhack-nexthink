@@ -89,3 +89,30 @@ button, input, textarea, select, a { -webkit-app-region: no-drag; }
 .issue-list { display: flex; flex-wrap: wrap; gap: 8px; }
 .issue-list .risk-tag { text-transform: none; letter-spacing: 0; font-size: var(--np-size-0); padding: 4px 8px; }
 .stat strong { color: var(--np-strong); font-size: var(--np-size-3); font-weight: var(--np-weight-strong); }
+
+/* Arbre v2 */
+.flow-node { position: relative; overflow: hidden; height: 100%; }
+.flow-node[data-type="missing"] { border-style: dashed; border-color: var(--np-strong); background: transparent; }
+.flow-node[data-type="tabs"] { border-color: var(--np-accent-gold); }
+.flow-node strong { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.flow-node small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mem-bar { position: absolute; left: 0; bottom: 0; height: 3px; background: var(--np-strong); opacity: 0.18; }
+.flow-node[data-type="heavy"] .mem-bar { background: var(--np-accent-coral); opacity: 0.7; }
+.flow-node[data-type="useful"] .mem-bar { background: var(--risk-auto); opacity: 0.6; }
+.react-flow__node { cursor: pointer; }
+.edge-to-missing .shock-draw,
+.edge-to-missing .react-flow__edge-path:not(.shock-draw) { stroke: var(--np-strong) !important; }
+.edge-to-tabs .shock-draw,
+.edge-to-tabs .react-flow__edge-path:not(.shock-draw) { stroke: var(--np-accent-gold) !important; }
+
+/* Panneau d'inspection */
+.inspector-panel { min-height: 300px; }
+.inspector-head { display: flex; justify-content: space-between; align-items: center; }
+.inspector-head .icon-button { min-height: 26px; padding: 0 6px; }
+.inspector h2 { word-break: break-word; }
+.tab-list { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 6px; font-size: var(--np-size-0); }
+.tab-list li { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--np-text); }
+.tab-list svg { vertical-align: -1px; color: var(--np-soft); }
+.divider { height: 1px; margin: 16px 0; background: var(--np-dash, var(--np-line)); }
+.graph-layout { grid-template-columns: minmax(0, 1fr) 320px; }
+.graph-layout .graph-stage { height: min(78vh, 860px); }

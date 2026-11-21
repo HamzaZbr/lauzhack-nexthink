@@ -27,6 +27,14 @@ export interface ProposedAction {
   args?: Record<string, unknown>;
 }
 
+export interface DayPlanResult {
+  blocks: DayBlock[];
+  summary: string;
+  source: "llm" | "fallback";
+  latencyMs: number;
+  error?: string;
+}
+
 export interface PreflightPlan {
   block: DayBlock;
   minutesBefore: number;
@@ -126,5 +134,7 @@ export interface PreflightApi {
   runActions(requests: ActionRequest[]): Promise<ActionLogEntry[]>;
   undo(id: string): Promise<ActionLogEntry | null>;
   journal(): Promise<ActionLogEntry[]>;
+  day(): Promise<DayBlock[]>;
+  planDay(text: string): Promise<DayPlanResult>;
   onEvent(cb: (event: { type: string; payload?: unknown }) => void): () => void;
 }
