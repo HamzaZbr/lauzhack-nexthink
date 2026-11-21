@@ -97,13 +97,13 @@ export function parseWifi(json: string): DeviceSnapshot["wifi"] {
   return null;
 }
 
-/** Sortie AppleScript : une ligne par onglet, champs séparés par une tabulation : fenêtre, index, titre, URL. */
+/** Sortie AppleScript : une ligne par onglet, champs séparés par une tabulation : fenêtre, index, titre, URL, actif (0/1). */
 export function parseChromeTabs(out: string): ChromeTab[] {
   return out
     .split("\n")
     .map((l) => l.split("\t"))
     .filter((c) => c.length >= 4)
-    .map(([w, i, title, url]) => ({ window: Number(w), index: Number(i), title, url }));
+    .map(([w, i, title, url, active]) => ({ window: Number(w), index: Number(i), title, url, active: active?.trim() === "1" }));
 }
 
 /** Règles simples : ce qui mérite d'être signalé avant un meeting. */
@@ -137,9 +137,12 @@ if application "Google Chrome" is running then
     repeat with w in windows
       set wi to wi + 1
       set ti to 0
+      set act to active tab index of w
       repeat with t in tabs of w
         set ti to ti + 1
-        set out to out & (wi as text) & TB & (ti as text) & TB & (title of t) & TB & (URL of t) & LF
+        set isAct to "0"
+        if ti = act then set isAct to "1"
+        set out to out & (wi as text) & TB & (ti as text) & TB & (title of t) & TB & (URL of t) & TB & isAct & LF
       end repeat
     end repeat
   end tell
@@ -147,9 +150,15 @@ if application "Google Chrome" is running then
 end if
 return ""`;
 
+/** TABS_SCOPE=front dans .env : seulement la fenêtre Chrome au premier plan (pour tester ou faire la démo). */
+export const tabsScope = (): "front" | "all" => (process.env.TABS_SCOPE === "front" ? "front" : "all");
+
 export async function readChromeTabs(): Promise<ChromeTab[] | null> {
   const out = await sh("osascript", ["-e", CHROME_TABS_SCRIPT], 5000);
-  return out === null ? null : parseChromeTabs(out);
+  if (out === null) return null;
+  const tabs = parseChromeTabs(out);
+  // Dans AppleScript, la fenêtre 1 est celle au premier plan.
+  return tabsScope() === "front" ? tabs.filter((t) => t.window === 1) : tabs;
 }
 
 let wifiCache: { at: number; value: DeviceSnapshot["wifi"] } | null = null;

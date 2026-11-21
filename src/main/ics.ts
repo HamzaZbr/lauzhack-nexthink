@@ -49,6 +49,8 @@ export function icsToBlocks(ics: string, day: Date, mapToToday = false): DayBloc
         source: "calendar",
         apps: appsFor(blob, link),
         link,
+        docs: [...new Set((blob.match(/[\w.-]+\.(xlsx|xls|csv|docx|doc|pptx|ppt|key|pages|numbers|pdf)\b/gi) ?? []).map((f) => f.replace(/\.[a-z]+$/i, "")))].slice(0, 3),
+        notes: text(inst.ev.description).replace(/https?:\/\/\S+/g, "").replace(/\s+/g, " ").trim().slice(0, 300) || undefined,
       });
     }
   }

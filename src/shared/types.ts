@@ -15,6 +15,12 @@ export interface DayBlock {
   source: "calendar" | "morning";
   apps: string[];
   link?: string;
+  /** Description de l'invitation (ordre du jour, documents), sans les liens. */
+  notes?: string;
+  /** Sites web utiles à ce bloc (ex. github.com) : onglets à mettre devant, jamais fermés. */
+  sites?: string[];
+  /** Mots-clés de documents (ex. budget_q4) : cherchés sur le Mac et ouverts avant le bloc. */
+  docs?: string[];
 }
 
 /** Une action que l'agent propose. Le LLM choisit `tool` dans le catalogue ; le code décide du risque. */
@@ -25,6 +31,32 @@ export interface ProposedAction {
   reason: string;
   risk: Risk;
   args?: Record<string, unknown>;
+  /** Pour le tri des onglets par l'IA : le détail onglet par onglet (l'utilisateur peut en décocher). */
+  tabs?: TabVerdict[];
+}
+
+export interface TabVerdict {
+  title: string;
+  url: string;
+  domain: string;
+  close: boolean;
+  reason: string;
+}
+
+export interface TriageInfo {
+  used: boolean;
+  latencyMs: number;
+  model: string;
+  kept?: number;
+  closed?: number;
+  error?: string;
+  cached?: boolean;
+}
+
+export interface TriageResponse {
+  verdicts: TabVerdict[] | null;
+  ai: TriageInfo | null;
+  blockTitle: string | null;
 }
 
 export interface CalendarInfo {
@@ -40,6 +72,15 @@ export interface ClockState {
   demo: boolean;
 }
 
+export interface CleanupItem {
+  id: string;
+  tool: "clean_cache" | "empty_trash" | "trash_old_downloads";
+  label: string;
+  explain: string;
+  sizeMb: number | null; // null = taille inconnue (accès refusé)
+  risk: Risk;
+}
+
 export interface DayPlanResult {
   blocks: DayBlock[];
   summary: string;
@@ -50,9 +91,13 @@ export interface DayPlanResult {
 
 export interface PreflightPlan {
   block: DayBlock;
+  /** Plus rien de prévu aujourd'hui : le pre-flight ne fait que les vérifications. */
+  idle?: boolean;
   minutesBefore: number;
   actions: ProposedAction[];
   snapshot: DeviceSnapshot;
+  /** Ce qu'a fait l'IA pour ce plan (tri des onglets). */
+  ai?: TriageInfo;
 }
 
 export interface ActionLogEntry {
@@ -66,6 +111,10 @@ export interface ActionLogEntry {
   undoable: boolean;
   /** Gain estimé (pour le récap de la semaine) */
   freedMb?: number;
+  /** Nombre d'éléments concernés : onglets fermés, problèmes détectés… */
+  items?: number;
+  /** Espace disque libéré (nettoyage de la pause café). */
+  freedDiskMb?: number;
 }
 
 /** Une demande d'exécution : un outil du catalogue + sa cible. */
@@ -97,6 +146,8 @@ export interface ChromeTab {
   index: number;
   title: string;
   url: string;
+  /** Onglet affiché en ce moment dans sa fenêtre. */
+  active?: boolean;
 }
 
 export type IssueLevel = "info" | "warn" | "critical";
@@ -117,7 +168,7 @@ export interface DeviceSnapshot {
   issues: DeviceIssue[];
 }
 
-export type PopupKind = "morning" | "preflight" | "coffee";
+export type PopupKind = "morning" | "preflight" | "coffee" | "evening";
 
 export interface LlmPingResult {
   ok: boolean;
@@ -153,5 +204,11 @@ export interface PreflightApi {
   reloadCalendar(): Promise<CalendarInfo>;
   clock(): Promise<ClockState>;
   setClock(hhmm: string | null): Promise<ClockState>;
+  triageTabs(fresh?: boolean): Promise<TriageResponse>;
+  tabsFeedback(keptDomains: string[], closedDomains: string[]): Promise<void>;
+  cleanupPlan(): Promise<CleanupItem[]>;
+  tomorrow(): Promise<DayBlock[]>;
+  carryOver(): Promise<string>;
+  setCarryOver(text: string): Promise<void>;
   onEvent(cb: (event: { type: string; payload?: unknown }) => void): () => void;
 }

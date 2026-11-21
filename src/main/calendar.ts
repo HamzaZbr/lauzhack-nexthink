@@ -15,6 +15,15 @@ import { now } from "./clock";
 import type { CalendarInfo } from "../shared/types";
 
 let info: CalendarInfo = { source: "demo", label: "Calendrier de démo", events: 0 };
+let lastIcs: { ics: string; demo: boolean } | null = null;
+
+/** Meetings de demain (même source que aujourd'hui). Pour le calendrier de démo : les mêmes qu'aujourd'hui. */
+export function tomorrowBlocks() {
+  if (!lastIcs) return [];
+  const d = now();
+  d.setDate(d.getDate() + 1);
+  return icsToBlocks(lastIcs.ics, d, lastIcs.demo);
+}
 let timer: NodeJS.Timeout | null = null;
 
 export const calendarInfo = () => info;
@@ -41,11 +50,13 @@ export async function loadCalendar(): Promise<CalendarInfo> {
   try {
     const { ics, info: src } = await readSource();
     const blocks = icsToBlocks(ics, now(), src.source === "demo");
+    lastIcs = { ics, demo: src.source === "demo" };
     setCalendar(blocks);
     info = { ...src, events: blocks.length, loadedAt: new Date().toISOString() };
   } catch (error) {
     const ics = await readFile(join(app.getAppPath(), "resources", "demo.ics"), "utf8");
     const blocks = icsToBlocks(ics, now(), true);
+    lastIcs = { ics, demo: true };
     setCalendar(blocks);
     info = { source: "demo", label: "Calendrier de démo (source réelle en erreur)", events: blocks.length, error: String((error as Error).message ?? error), loadedAt: new Date().toISOString() };
   }

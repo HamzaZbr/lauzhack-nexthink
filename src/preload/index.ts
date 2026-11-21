@@ -20,6 +20,12 @@ const api: PreflightApi = {
   reloadCalendar: () => ipcRenderer.invoke("calendar:reload"),
   clock: () => ipcRenderer.invoke("clock:get"),
   setClock: (hhmm: string | null) => ipcRenderer.invoke("clock:set", hhmm),
+  triageTabs: (fresh?: boolean) => ipcRenderer.invoke("tabs:triage", fresh),
+  tabsFeedback: (kept: string[], closed: string[]) => ipcRenderer.invoke("tabs:feedback", kept, closed),
+  cleanupPlan: () => ipcRenderer.invoke("cleanup:plan"),
+  tomorrow: () => ipcRenderer.invoke("day:tomorrow"),
+  carryOver: () => ipcRenderer.invoke("carry:get"),
+  setCarryOver: (text: string) => ipcRenderer.invoke("carry:set", text),
   onEvent: (cb) => {
     const listener = (_e: unknown, event: { type: string; payload?: unknown }) => cb(event);
     ipcRenderer.on("event", listener);

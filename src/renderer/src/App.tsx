@@ -6,7 +6,7 @@ import { Today } from "./views/Today";
 import { MyPc } from "./views/MyPc";
 import { Journal } from "./views/Journal";
 import { Week } from "./views/Week";
-import type { AppInfo, ClockState, LlmPingResult } from "@shared/types";
+import type { AppInfo, ClockState, DayBlock, LlmPingResult } from "@shared/types";
 
 export type View = "today" | "pc" | "journal" | "week";
 type Theme = "light" | "dark";
@@ -166,20 +166,20 @@ function Sidebar({ view, setView, theme, setTheme }: { view: View; setView: (v: 
 }
 
 /** Horloge de démo : régler l'heure de l'app pour déclencher les pop-ups pendant le pitch. */
-const DEMO_TIMES = [
-  { hhmm: "08:30", label: "brief" },
-  { hhmm: "09:55", label: "pre-flight" },
-  { hhmm: "10:45", label: "café" },
-];
+const toMin = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
+const toHHMM = (m: number) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
 
 function DemoClock() {
   const [clock, setClock] = useState<ClockState | null>(null);
+  const [day, setDay] = useState<DayBlock[]>([]);
   useEffect(() => {
     const read = () => window.api.clock().then(setClock);
     void read();
+    window.api.day().then(setDay);
     const t = setInterval(read, 15_000);
     const off = window.api.onEvent((e) => {
       if (e.type === "clock-updated") setClock(e.payload as ClockState);
+      if (e.type === "day-updated") setDay(e.payload as DayBlock[]);
     });
     return () => {
       clearInterval(t);
@@ -187,6 +187,17 @@ function DemoClock() {
     };
   }, []);
 
+  // Les boutons suivent la vraie journée : 5 min avant le 1er bloc à préparer, et le début du créneau libre.
+  const first = day.find((b) => b.kind === "meeting") ?? day.find((b) => b.kind === "focus");
+  const free = day.find((b) => b.kind === "free");
+  const times = [
+    { hhmm: "08:30", label: "brief" },
+    ...(first ? [{ hhmm: toHHMM(Math.max(0, toMin(first.start) - 5)), label: "pre-flight" }] : []),
+    ...(free ? [{ hhmm: free.start, label: "café" }] : []),
+    { hhmm: "18:00", label: "bilan" },
+  ];
+
+  const [custom, setCustom] = useState("13:55");
   const set = async (hhmm: string | null) => {
     setClock(await window.api.setClock(hhmm));
     if (hhmm === "08:30") void window.api.openPopup("morning");
@@ -197,13 +208,18 @@ function DemoClock() {
       <p className="section-trigger"><Clock size={13} /> Horloge {clock?.demo ? "· démo" : ""}</p>
       <strong className="demo-time">{clock?.hhmm ?? "--:--"}</strong>
       <div className="demo-buttons">
-        {DEMO_TIMES.map((t) => (
-          <button key={t.hhmm} className="filter-chip" data-active={clock?.hhmm === t.hhmm} onClick={() => set(t.hhmm)} title={`Mettre l'horloge à ${t.hhmm}`}>
+        {times.map((t) => (
+          <button key={t.label} className="filter-chip" data-active={clock?.hhmm === t.hhmm} onClick={() => set(t.hhmm)} title={`Mettre l'horloge à ${t.hhmm}`}>
             {t.hhmm} <span className="microcopy">{t.label}</span>
           </button>
         ))}
         {clock?.demo ? <button className="filter-chip" onClick={() => set(null)}>heure réelle</button> : null}
       </div>
+      <form className="demo-custom" onSubmit={(e) => { e.preventDefault(); void set(custom); }}>
+        <input type="time" value={custom} onChange={(e) => setCustom(e.target.value)} aria-label="Régler l'horloge" />
+        <button className="filter-chip" type="submit">aller à</button>
+      </form>
+      {!first ? <p className="microcopy">Rien à préparer aujourd'hui : fais le brief (08:30) ou vérifie le calendrier.</p> : null}
     </div>
   );
 }

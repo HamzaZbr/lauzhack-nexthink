@@ -30,7 +30,8 @@ export function Today() {
   };
   const nowMin = clock ? Number(clock.hhmm.slice(0, 2)) * 60 + Number(clock.hhmm.slice(3)) : 0;
   const toMin = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3));
-  const nextId = day.find((b) => b.kind === "meeting" && toMin(b.end) > nowMin)?.id;
+  const upcoming = day.filter((b) => b.kind !== "free" && toMin(b.end) > nowMin);
+  const nextId = (upcoming.find((b) => toMin(b.start) >= nowMin && toMin(b.start) - nowMin <= 10) ?? upcoming[0])?.id;
   const hasMorning = day.some((b) => b.source === "morning");
   return (
     <div className="page-stack">
@@ -46,7 +47,8 @@ export function Today() {
       </div>
       <section className="timeline">
         {day.map((block, i) => (
-          <motion.div key={block.id} className="timeline-row" data-kind={block.kind} data-next={block.id === nextId} {...reveal(0.04 * i)}>
+          <motion.div key={block.id} className="timeline-row" data-kind={block.kind} data-next={block.id === nextId}
+            data-past={clock ? toMin(block.end) <= nowMin : undefined} {...reveal(0.04 * i)}>
             <time>{block.start} – {block.end}</time>
             <div>
               <span className="block-kind">{kindLabel[block.kind]} · {block.source === "calendar" ? "calendrier" : "ajouté ce matin"}</span>

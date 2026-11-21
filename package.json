@@ -8,7 +8,9 @@
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "start": "electron-vite preview",
-    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json"
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
+    "bench:llm": "node scripts/bench-llm.mjs",
+    "demo:tabs": "node scripts/demo-tabs.mjs"
   },
   "dependencies": {
     "dotenv": "^18.0.10",

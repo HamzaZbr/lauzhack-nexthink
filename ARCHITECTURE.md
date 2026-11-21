@@ -74,6 +74,24 @@ affiche « fait / simulé / échec »
 6. Si le LLM échoue (erreur, plus de 12 s, rien de valide) → **plan de secours** : un bloc de 45 min par morceau de phrase.
 7. La journée est mise à jour : la timeline, l'arbre et le prochain pre-flight utilisent les nouveaux blocs.
 
+## 3 quater. Comment l'IA trie les onglets
+
+1. La page **Mon PC** ou le **pre-flight** demande le tri. `agent.ts` (`getTriage`) regarde d'abord le **cache** : même bloc, mêmes onglets, il y a moins de 5 min → même réponse. L'arbre et le pop-up affichent donc **la même décision**. Si les deux demandent en même temps, un seul appel part.
+2. Sinon, il envoie au LLM :
+   - le prochain bloc (titre, heure, apps, description de l'invitation) et les autres blocs du jour ;
+   - `USER_CONTEXT` (une phrase sur toi) et tes préférences apprises (`prefs.ts`) ;
+   - une ligne par onglet : `12 | youtube.com | lofi beats | (affiché)`.
+   Les onglets partent en **paquets de 25, envoyés en même temps** (76 onglets = 4 appels en parallèle). Un paquet qui échoue = ses onglets sont gardés. `TOGETHER_TABS_MODEL` permet un modèle rapide rien que pour ce tri (choisi avec `npm run bench:llm`).
+3. Le LLM répond **seulement avec les onglets à fermer** : `{ close: [{ i: 12, reason: "vidéo sans rapport avec la revue budget" }] }`. Tout le reste est gardé. La réponse est courte, donc rapide et rarement coupée.
+4. `tabs.ts` applique les **garde-fous** :
+   - jamais fermés : l'onglet affiché, le lien du meeting, la messagerie, les documents Office/Google utiles au meeting ;
+   - si une copie d'une page est gardée, aucune copie n'est fermée ;
+   - au plus 40 fermetures d'un coup.
+5. **Arbre** : groupes par site, rouge = tout à fermer, or = en partie, vert = tout gardé. Clic → chaque onglet avec « fermer · raison » ou « garder ».
+6. **Pop-up** : « Fermer N onglets sans rapport » + « Voir onglet par onglet » (décochable).
+7. **Apprentissage** : quand tu décoches un onglet, son site est noté « à garder » ; quand tu fermes, « fermable ». C'est redonné à l'IA la fois suivante.
+8. En cas d'échec (délai de 25 s, réponse invalide…) → règle simple (doublons), et l'erreur exacte s'affiche (pop-up, page Mon PC, terminal).
+
 ## 3 ter. Ce qui se passe quand tu cliques sur « 09:55 » (démo)
 
 1. La sidebar appelle `window.api.setClock("09:55")` → `clock.ts` décale l'horloge de l'app (le temps continue ensuite à s'écouler).
@@ -92,12 +110,16 @@ affiche « fait / simulé / échec »
 | `actions.ts` | **Agit sur le Mac.** Catalogue d'outils, niveaux de risque, validation, exécution, journal, annuler |
 | `planner.ts` | Construit le plan du pre-flight à partir du prochain bloc + de la photo du Mac (règles) |
 | `llm.ts` | Appelle Together AI et force une réponse JSON qui suit un schéma |
-| `agent.ts` | Ce que fait le LLM : le brief du matin (phrase → blocs), avec vérification et plan de secours |
+| `agent.ts` | Ce que fait le LLM : le brief du matin (phrase → blocs) et le tri des onglets du pre-flight, avec vérification et plan de secours |
+| `tabs.ts` | Garde-fous du tri des onglets : ce que l'IA a le **droit** de fermer (fonctions pures, testées) |
+| `prefs.ts` | Ce que l'agent apprend de toi, en local (`prefs.json`) : sites que tu gardes / fermes, et « ce qui reste pour demain » du bilan |
 | `day.ts` | La journée : meetings + créneau de maintenance calculé + tâches du matin ; créneaux libres pour le brief |
 | `clock.ts` | Horloge de l'app, décalable pour la démo (boutons 08:30 / 09:55 / 10:45 dans la sidebar) |
 | `calendar.ts` | Charge le calendrier : lien ICS (`CALENDAR_ICS_URL`), fichier, ou `resources/demo.ics` ; recharge toutes les 10 min |
 | `ics.ts` | Lit un `.ics` → meetings du jour (récurrences, fuseaux Outlook, liens Teams/Zoom, apps devinées) |
-| `scheduler.ts` | Toutes les 15 s : ouvre le pre-flight 5 min avant un meeting, le café au début du créneau libre |
+| `scheduler.ts` | Toutes les 15 s : tri des onglets 8 min avant, pre-flight 5 min avant un meeting ou une tâche, café au début du créneau libre, bilan à 18:00 |
+| `workspace.ts` | Préparer l'espace de travail : documents cités trouvés par Spotlight (`mdfind`), onglets à mettre devant ou sites à ouvrir |
+| `cleanup.ts` | Pause café : mesure des caches reconstructibles (liste fermée), de la Corbeille et des vieux téléchargements |
 
 ### `src/shared/` : ce que main et UI partagent
 | Fichier | Rôle |
@@ -105,6 +127,7 @@ affiche « fait / simulé / échec »
 | `types.ts` | Toutes les formes de données (bloc de journée, action, photo du Mac, entrée de journal) |
 | `mock.ts` | Ancienne journée d'exemple (plus utilisée par l'app, remplacée par `resources/demo.ics`) |
 | `apps.ts` | Apps protégées, apps « à documents », correspondance « Teams » ↔ « Microsoft Teams » |
+| `week.ts` | Récap de la semaine calculé depuis le journal ; hypothèses du « temps gagné » (5 min par problème repéré, 6 s par onglet…) |
 | `tree.ts` | Construit l'arbre « pourquoi » (blocs → apps → onglets par site) à partir de la journée et de la photo du Mac |
 
 ### `src/renderer/src/` : l'interface (React)
@@ -115,8 +138,8 @@ affiche « fait / simulé / échec »
 | `views/Today.tsx` | Timeline de la journée |
 | `views/MyPc.tsx` | État du Mac + arbre animé |
 | `views/Journal.tsx` | Journal des actions + Annuler |
-| `views/Week.tsx` | Récap de la semaine (encore des chiffres d'exemple) |
-| `popup/Popup.tsx` | Les 3 pop-ups : brief du matin, pre-flight, café |
+| `views/Week.tsx` | Récap de la semaine : vrais chiffres depuis le journal, barres par jour, hypothèses affichées |
+| `popup/Popup.tsx` | Les 4 pop-ups : brief du matin, pre-flight, pause café (nettoyage), bilan du soir |
 | `theme/`, `styles.css`, `motion/`, `graphMotion.tsx` | Design et animations repris de Contagion |
 | `app.css` | Styles propres à Preflight (tags de risque, timeline, pop-ups) |
 
@@ -143,6 +166,8 @@ Oui, lis-en une partie : le jury va te poser des questions sur **comment** l'age
 5. Si tu as le temps : `src/renderer/src/popup/Popup.tsx`, fonction `Preflight`, pour voir comment l'UI appelle `window.api`.
 
 ## 7. Déboguer
+
+- **L'IA est lente ou ne répond pas** : `npm run bench:llm` essaie plusieurs modèles avec ta clé (≈ 1-2 min) et indique le plus rapide qui marche. Mets-le dans `.env` : `TOGETHER_TABS_MODEL=...`.
 
 - **Les erreurs du main** (capteurs, actions, LLM) s'affichent dans le **terminal** où tourne `npm run dev`.
 - **Les erreurs de l'UI** : dans la fenêtre, `Cmd+Option+I` ouvre les outils de développement (onglet Console).

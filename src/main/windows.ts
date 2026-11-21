@@ -47,7 +47,8 @@ export function showDashboard(view = "today") {
 const POPUP_SIZE: Record<PopupKind, { width: number; height: number }> = {
   morning: { width: 440, height: 460 },
   preflight: { width: 440, height: 600 },
-  coffee: { width: 400, height: 300 },
+  coffee: { width: 460, height: 560 },
+  evening: { width: 460, height: 640 },
 };
 
 /** Ouvre un pop-up en haut à droite de l'écran, au-dessus de tout, sans barre de titre. */

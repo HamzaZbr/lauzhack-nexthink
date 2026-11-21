@@ -11,8 +11,11 @@ import { catalog, getJournal, initJournal, runActions, undo } from "./actions";
 import { planPreflight } from "./planner";
 import { takeSnapshot } from "./sensors";
 import { getDay, onDayChange } from "./day";
-import { planDay } from "./agent";
-import { calendarInfo, loadCalendar } from "./calendar";
+import { getTriage, planDay } from "./agent";
+import { getCarryOver, recordFeedback, setCarryOver } from "./prefs";
+import { cleanupPlan } from "./cleanup";
+import { nextBlock } from "./planner";
+import { calendarInfo, loadCalendar, tomorrowBlocks } from "./calendar";
 import { clockState, setDemoTime } from "./clock";
 import { resetScheduler, startScheduler } from "./scheduler";
 import type { ActionRequest, PopupKind } from "../shared/types";
@@ -31,6 +34,7 @@ function createTray() {
       { label: "Brief du matin", click: () => openPopup("morning") },
       { label: "Pre-flight (meeting dans 5 min)", click: () => openPopup("preflight") },
       { label: "Pause café", click: () => openPopup("coffee") },
+      { label: "Bilan de la journée", click: () => openPopup("evening") },
       { type: "separator" },
       { label: "Quitter", role: "quit" },
     ]),
@@ -58,8 +62,26 @@ function registerIpc() {
   ipcMain.handle("actions:undo", (_e, id: string) => undo(id));
   ipcMain.handle("journal:list", () => getJournal());
   ipcMain.handle("day:get", () => getDay());
-  ipcMain.handle("day:plan", (_e, text: string) => planDay(String(text ?? "").slice(0, 500)));
+  ipcMain.handle("day:plan", async (_e, text: string) => {
+    const res = await planDay(String(text ?? "").slice(0, 500));
+    if (res.blocks.length) setCarryOver("");
+    return res;
+  });
   ipcMain.handle("calendar:info", () => calendarInfo());
+  ipcMain.handle("cleanup:plan", () => cleanupPlan());
+  ipcMain.handle("day:tomorrow", () => tomorrowBlocks());
+  ipcMain.handle("carry:get", () => getCarryOver());
+  ipcMain.handle("carry:set", (_e, text: string) => setCarryOver(String(text ?? "")));
+  ipcMain.handle("tabs:triage", async (_e, fresh?: boolean) => {
+    const snap = await takeSnapshot(false);
+    const block = nextBlock();
+    if (!snap.chromeTabs || snap.chromeTabs.length < 3) return { verdicts: null, ai: null, blockTitle: block?.title ?? null };
+    const t = await getTriage(snap.chromeTabs, block, !!fresh);
+    return { verdicts: t.info.used ? t.verdicts : null, ai: t.info, blockTitle: block?.title ?? null };
+  });
+  ipcMain.handle("tabs:feedback", (_e, kept: string[], closed: string[]) =>
+    recordFeedback((kept ?? []).filter((d) => typeof d === "string").slice(0, 50), (closed ?? []).filter((d) => typeof d === "string").slice(0, 50)),
+  );
   ipcMain.handle("calendar:reload", () => loadCalendar());
   ipcMain.handle("clock:get", () => clockState());
   ipcMain.handle("clock:set", (_e, value: string | null) => {

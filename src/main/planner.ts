@@ -8,6 +8,9 @@ import { now } from "./clock";
 import { appMatches, isProtected } from "../shared/apps";
 import { riskOf } from "./actions";
 import { takeSnapshot } from "./sensors";
+import { getTriage } from "./agent";
+import { hasKey } from "./llm";
+import { planWorkspace } from "./workspace";
 import type { ActionRequest, DayBlock, PreflightPlan, ProposedAction } from "../shared/types";
 
 const nowMin = () => {
@@ -15,18 +18,27 @@ const nowMin = () => {
   return d.getHours() * 60 + d.getMinutes();
 };
 
-/** Prochain meeting selon l'horloge (celui en cours compte encore), sinon le premier de la journée. */
-export function nextBlock(): DayBlock {
-  const day = getDay();
-  const meetings = day.filter((b) => b.kind === "meeting");
-  return meetings.find((b) => toMin(b.end) > nowMin()) ?? meetings[0] ?? day[0];
+/**
+ * Prochain bloc selon l'horloge : le plus proche dans le temps, meeting OU tâche (celui en cours compte encore,
+ * sauf s'il en commence un autre dans les 10 min). null s'il ne reste plus rien aujourd'hui.
+ */
+export function nextBlock(): DayBlock | null {
+  const n = nowMin();
+  const upcoming = getDay()
+    .filter((b) => b.kind !== "free" && toMin(b.end) > n)
+    .sort((a, b) => toMin(a.start) - toMin(b.start));
+  const startingSoon = upcoming.find((b) => toMin(b.start) >= n && toMin(b.start) - n <= 10);
+  return startingSoon ?? upcoming[0] ?? null;
 }
 
 const HEAVY_MB = 500;
 
 export async function planPreflight(): Promise<PreflightPlan> {
-  const block = nextBlock();
-  if (!block) throw new Error("Aucun meeting dans la journée.");
+  const next = nextBlock();
+  const n0 = nowMin();
+  const hhmmNow = `${String(Math.floor(n0 / 60)).padStart(2, "0")}:${String(n0 % 60).padStart(2, "0")}`;
+  // Plus rien aujourd'hui : on garde les vérifications et le tri, sans bloc à préparer.
+  const block: DayBlock = next ?? { id: "none", start: hhmmNow, end: hhmmNow, title: "Plus rien de prévu aujourd'hui", kind: "free", source: "calendar", apps: [] };
   const snapshot = await takeSnapshot(true);
   const actions: ProposedAction[] = [];
   let n = 0;
@@ -45,13 +57,32 @@ export async function planPreflight(): Promise<PreflightPlan> {
     .filter((a) => a.name !== "Google Chrome") // Chrome : on traite les onglets, pas l'app entière
     .slice(0, 3)
     .forEach((a) =>
-      add({ tool: "quit_app", target: a.name }, `${a.memMb} Mo de RAM, CPU ${a.cpu} %, pas utile pour « ${block.title} ».`),
+      add({ tool: "quit_app", target: a.name }, next ? `${a.memMb} Mo de RAM, CPU ${a.cpu} %, pas utile pour « ${block.title} ».` : `${a.memMb} Mo de RAM, CPU ${a.cpu} %, et plus rien de prévu aujourd'hui.`),
     );
 
-  // 3. Onglets Chrome en double
-  if (snapshot.chromeTabs?.length) {
+  // 3. Onglets Chrome : l'IA trie (même résultat que l'arbre, grâce au cache) ; si elle échoue, règle simple (doublons).
+  let ai: PreflightPlan["ai"];
+  const tabs = snapshot.chromeTabs ?? [];
+  let aiDone = false;
+  if (tabs.length >= 3 && hasKey()) {
+    const t = await getTriage(tabs, next);
+    ai = t.info;
+    if (t.info.used) {
+      aiDone = true;
+      const close = t.verdicts.filter((v) => v.close);
+      if (close.length) {
+        const urls = [...new Set(close.map((v) => v.url))];
+        add(
+          { tool: "close_tabs", target: `${close.length} onglet${close.length > 1 ? "s" : ""} sans rapport avec « ${block.title} »`, args: { urls, mode: "all" } },
+          `Trié par l'IA : j'en garde ${t.verdicts.length - close.length} (liés à ta journée, en cours ou protégés). ~${((close.length * 80) / 1024).toFixed(1).replace(".", ",")} Go libérés. Les liens sont gardés pour les rouvrir.`,
+        );
+        actions[actions.length - 1].tabs = t.verdicts;
+      }
+    }
+  }
+  if (!aiDone && tabs.length) {
     const counts = new Map<string, number>();
-    snapshot.chromeTabs.forEach((t) => counts.set(t.url, (counts.get(t.url) ?? 0) + 1));
+    tabs.forEach((t) => counts.set(t.url, (counts.get(t.url) ?? 0) + 1));
     const dupUrls = [...counts.entries()].filter(([, c]) => c > 1).map(([u]) => u);
     const extra = [...counts.values()].reduce((s, c) => s + Math.max(0, c - 1), 0);
     if (extra > 0)
@@ -69,13 +100,16 @@ export async function planPreflight(): Promise<PreflightPlan> {
     .filter((w) => !snapshot.apps.some((a) => appMatches(w, a.name)))
     .forEach((w) => add({ tool: "open_app", target: w === "Teams" ? "Microsoft Teams" : w }, `Nécessaire pour « ${block.title} ».`));
 
+  // 5 bis. Espace de travail : documents cités (trouvés sur le Mac) et sites utiles (onglet mis devant ou ouvert)
+  if (next) for (const w of await planWorkspace(next, snapshot.chromeTabs)) add(w.req, w.reason);
+
   // 6. Mise à jour système (démo) : jamais pendant un meeting, proposée pour le prochain créneau libre
   const free = getMaintenanceSlot();
-  if (free)
+  if (free && toMin(free.start) > nowMin())
     add(
       { tool: "install_update", target: `Mise à jour macOS à ${free.start}` },
       `Redémarrage nécessaire (~8 min) : je la place pendant ton créneau libre ${free.start}–${free.end}. Simulée dans ce prototype.`,
     );
 
-  return { block, minutesBefore: Math.max(0, toMin(block.start) - nowMin()), actions, snapshot };
+  return { block, idle: !next, minutesBefore: Math.max(0, toMin(block.start) - nowMin()), actions, snapshot, ai };
 }

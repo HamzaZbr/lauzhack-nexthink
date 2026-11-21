@@ -29,7 +29,7 @@ export function Journal() {
           <div key={entry.id} className="action-row">
             <time className="microcopy">{new Date(entry.at).toLocaleTimeString("fr-CH", { hour: "2-digit", minute: "2-digit" })}</time>
             <div>
-              <strong>{entry.target}</strong>
+              <strong>{entry.title ?? entry.target}</strong>
               <p>{entry.detail}</p>
               <p>{entry.tool} · <span className="risk-tag" data-risk={entry.risk}>{entry.risk}</span> · {statusLabel[entry.status]}</p>
             </div>
