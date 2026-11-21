@@ -31,3 +31,5 @@ src/renderer/    l'UI React (design repris de Contagion)
 - Le LLM **propose** un plan en JSON ; le code vérifie que chaque action existe dans le catalogue et applique son niveau de risque.
 - Risques : `auto` (lecture seule) · `confirm` (réversible, 1 clic) · `ask` (toujours demander).
 - Chaque action est journalisée et, si possible, annulable.
+- Par défaut `PREFLIGHT_DRY_RUN=1` : les actions sont simulées. Mets `PREFLIGHT_DRY_RUN=0` dans `.env` pour agir pour de vrai.
+- Au premier pre-flight, macOS demande d’autoriser l’app à contrôler Chrome (onglets) : accepte.

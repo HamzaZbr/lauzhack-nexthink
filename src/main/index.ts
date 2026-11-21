@@ -7,7 +7,10 @@ import { join } from "node:path";
 import { config as loadEnv } from "dotenv";
 import { hasKey, model, ping } from "./llm";
 import { closePopup, openPopup, showDashboard, toDashboard } from "./windows";
-import type { PopupKind } from "../shared/types";
+import { catalog, getJournal, initJournal, runActions, undo } from "./actions";
+import { planPreflight } from "./planner";
+import { takeSnapshot } from "./sensors";
+import type { ActionRequest, PopupKind } from "../shared/types";
 
 loadEnv({ path: join(app.getAppPath(), ".env") });
 
@@ -43,9 +46,16 @@ function registerIpc() {
   ipcMain.handle("dashboard:show", (_e, view?: string) => {
     showDashboard(view);
   });
+  ipcMain.handle("device:snapshot", (_e, fresh?: boolean) => takeSnapshot(fresh ?? true));
+  ipcMain.handle("actions:catalog", () => catalog());
+  ipcMain.handle("preflight:plan", () => planPreflight());
+  ipcMain.handle("actions:run", (_e, requests: ActionRequest[]) => runActions(requests));
+  ipcMain.handle("actions:undo", (_e, id: string) => undo(id));
+  ipcMain.handle("journal:list", () => getJournal());
 }
 
 app.whenReady().then(() => {
+  initJournal((journal) => toDashboard("journal-updated", journal));
   registerIpc();
   createTray();
   showDashboard();

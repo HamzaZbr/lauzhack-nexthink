@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import type { PopupKind, PreflightApi } from "../shared/types";
+import type { ActionRequest, PopupKind, PreflightApi } from "../shared/types";
 
 const api: PreflightApi = {
   info: () => ipcRenderer.invoke("app:info"),
@@ -8,6 +8,12 @@ const api: PreflightApi = {
   closePopup: () => ipcRenderer.invoke("popup:close"),
   popupAnswer: (kind: PopupKind, data: unknown) => ipcRenderer.invoke("popup:answer", kind, data),
   showDashboard: (view?: string) => ipcRenderer.invoke("dashboard:show", view),
+  snapshot: (fresh?: boolean) => ipcRenderer.invoke("device:snapshot", fresh),
+  catalog: () => ipcRenderer.invoke("actions:catalog"),
+  planPreflight: () => ipcRenderer.invoke("preflight:plan"),
+  runActions: (requests: ActionRequest[]) => ipcRenderer.invoke("actions:run", requests),
+  undo: (id: string) => ipcRenderer.invoke("actions:undo", id),
+  journal: () => ipcRenderer.invoke("journal:list"),
   onEvent: (cb) => {
     const listener = (_e: unknown, event: { type: string; payload?: unknown }) => cb(event);
     ipcRenderer.on("event", listener);

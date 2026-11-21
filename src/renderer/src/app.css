@@ -84,3 +84,8 @@ button, input, textarea, select, a { -webkit-app-region: no-drag; }
 .edge-to-useful .react-flow__edge-path:not(.shock-draw) { stroke: var(--risk-auto) !important; }
 .edge-to-idle .shock-draw,
 .edge-to-idle .react-flow__edge-path:not(.shock-draw) { stroke: var(--np-soft) !important; }
+
+/* Problèmes détectés (page Mon PC) */
+.issue-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.issue-list .risk-tag { text-transform: none; letter-spacing: 0; font-size: var(--np-size-0); padding: 4px 8px; }
+.stat strong { color: var(--np-strong); font-size: var(--np-size-3); font-weight: var(--np-weight-strong); }

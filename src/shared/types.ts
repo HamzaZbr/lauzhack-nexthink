@@ -24,6 +24,14 @@ export interface ProposedAction {
   target: string;
   reason: string;
   risk: Risk;
+  args?: Record<string, unknown>;
+}
+
+export interface PreflightPlan {
+  block: DayBlock;
+  minutesBefore: number;
+  actions: ProposedAction[];
+  snapshot: DeviceSnapshot;
 }
 
 export interface ActionLogEntry {
@@ -31,8 +39,61 @@ export interface ActionLogEntry {
   at: string; // ISO
   tool: string;
   target: string;
-  status: "done" | "undone" | "failed" | "skipped";
+  risk: Risk;
+  status: "done" | "undone" | "failed" | "simulated";
+  detail: string;
   undoable: boolean;
+  /** Gain estimé (pour le récap de la semaine) */
+  freedMb?: number;
+}
+
+/** Une demande d'exécution : un outil du catalogue + sa cible. */
+export interface ActionRequest {
+  tool: string;
+  target: string;
+  /** Arguments structurés (ex. liste d'URL d'onglets). */
+  args?: Record<string, unknown>;
+}
+
+export interface ToolInfo {
+  tool: string;
+  label: string;
+  risk: Risk;
+  description: string;
+}
+
+/* ---------- Capteurs ---------- */
+
+export interface AppUsage {
+  name: string; // ex. "Google Chrome"
+  memMb: number; // RAM totale (process + helpers)
+  cpu: number; // % CPU cumulé
+  processes: number;
+}
+
+export interface ChromeTab {
+  window: number;
+  index: number;
+  title: string;
+  url: string;
+}
+
+export type IssueLevel = "info" | "warn" | "critical";
+export interface DeviceIssue {
+  id: string;
+  level: IssueLevel;
+  message: string;
+}
+
+export interface DeviceSnapshot {
+  at: string; // ISO
+  battery: { percent: number; charging: boolean } | null;
+  disk: { freeGb: number; totalGb: number } | null;
+  memory: { totalGb: number; usedGb: number } | null;
+  wifi: { rssi: number; noise: number | null } | null;
+  apps: AppUsage[]; // triées par RAM décroissante
+  chromeTabs: ChromeTab[] | null; // null si Chrome fermé ou accès refusé
+  issues: DeviceIssue[];
 }
 
 export type PopupKind = "morning" | "preflight" | "coffee";
@@ -59,5 +120,11 @@ export interface PreflightApi {
   closePopup(): Promise<void>;
   popupAnswer(kind: PopupKind, data: unknown): Promise<void>;
   showDashboard(view?: string): Promise<void>;
+  snapshot(fresh?: boolean): Promise<DeviceSnapshot>;
+  catalog(): Promise<ToolInfo[]>;
+  planPreflight(): Promise<PreflightPlan>;
+  runActions(requests: ActionRequest[]): Promise<ActionLogEntry[]>;
+  undo(id: string): Promise<ActionLogEntry | null>;
+  journal(): Promise<ActionLogEntry[]>;
   onEvent(cb: (event: { type: string; payload?: unknown }) => void): () => void;
 }
