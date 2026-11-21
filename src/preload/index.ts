@@ -16,6 +16,10 @@ const api: PreflightApi = {
   journal: () => ipcRenderer.invoke("journal:list"),
   day: () => ipcRenderer.invoke("day:get"),
   planDay: (text: string) => ipcRenderer.invoke("day:plan", text),
+  calendarInfo: () => ipcRenderer.invoke("calendar:info"),
+  reloadCalendar: () => ipcRenderer.invoke("calendar:reload"),
+  clock: () => ipcRenderer.invoke("clock:get"),
+  setClock: (hhmm: string | null) => ipcRenderer.invoke("clock:set", hhmm),
   onEvent: (cb) => {
     const listener = (_e: unknown, event: { type: string; payload?: unknown }) => cb(event);
     ipcRenderer.on("event", listener);

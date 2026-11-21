@@ -12,6 +12,7 @@ import { promisify } from "node:util";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { takeSnapshot } from "./sensors";
+import { now } from "./clock";
 import { isDocumentApp, isProtected } from "../shared/apps";
 import type { ActionLogEntry, ActionRequest, Risk, ToolInfo } from "../shared/types";
 
@@ -215,7 +216,7 @@ export async function runActions(requests: ActionRequest[]): Promise<ActionLogEn
     const def = tools.find((t) => t.tool === req.tool);
     const entry: ActionLogEntry = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-      at: new Date().toISOString(),
+      at: now().toISOString(), // heure de l'app : suit l'horloge de démo
       tool: req.tool,
       target: req.target,
       risk: def ? (def.riskFor?.(req) ?? def.risk) : "ask",

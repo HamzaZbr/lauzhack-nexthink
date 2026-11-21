@@ -13,7 +13,6 @@ function actionTitle(a: { tool: string; target: string }, meetingLink?: string) 
   if (a.tool === "open_app") return `Ouvrir ${a.target}`;
   return a.target;
 }
-const nowHHMM = () => new Date().toLocaleTimeString("fr-CH", { hour: "2-digit", minute: "2-digit" });
 
 export function Popup({ kind }: { kind: PopupKind }) {
   useEffect(() => {
@@ -37,9 +36,11 @@ function Morning() {
   const [calendar, setCalendar] = useState<DayBlock[]>([]);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<DayPlanResult | null>(null);
+  const [time, setTime] = useState("");
 
   useEffect(() => {
     window.api.day().then((d) => setCalendar(d.filter((b) => b.source === "calendar" && b.kind === "meeting")));
+    window.api.clock().then((c) => setTime(c.hhmm));
   }, []);
 
   const submit = async () => {
@@ -80,7 +81,7 @@ function Morning() {
   return (
     <>
       <div>
-        <p className="eyebrow">Brief du matin · {nowHHMM()}</p>
+        <p className="eyebrow">Brief du matin · {time}</p>
         <h2>Bonjour. Voilà ta journée.</h2>
       </div>
       <div className="mini-blocks">
@@ -190,21 +191,65 @@ function Preflight() {
 }
 
 function CoffeeBreak() {
+  const [free, setFree] = useState<DayBlock | null>(null);
+  const [next, setNext] = useState<DayBlock | null>(null);
+  const [result, setResult] = useState<ActionLogEntry[] | null>(null);
+
+  useEffect(() => {
+    window.api.day().then((d) => {
+      const f = d.find((b) => b.kind === "free") ?? null;
+      setFree(f);
+      setNext(f ? d.find((b) => b.kind === "meeting" && b.start >= f.end) ?? null : null);
+    });
+  }, []);
+
+  const add = (hhmm: string, min: number) => {
+    const [h, m] = hhmm.split(":").map(Number);
+    const t = h * 60 + m + min;
+    return `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`;
+  };
+
+  const go = async () => {
+    if (!free) return;
+    setResult(await window.api.runActions([{ tool: "install_update", target: `Mise à jour macOS à ${free.start}` }]));
+  };
+
+  if (!free)
+    return (
+      <div>
+        <p className="eyebrow">Pause café</p>
+        <h2>Pas de créneau libre aujourd'hui.</h2>
+      </div>
+    );
+
   return (
     <>
       <div>
-        <p className="eyebrow"><Coffee size={12} style={{ verticalAlign: -1 }} /> Créneau libre · 10:45 – 11:30</p>
+        <p className="eyebrow"><Coffee size={12} style={{ verticalAlign: -1 }} /> Créneau libre · {free.start} – {free.end}</p>
         <h2>Prends un café, je m'occupe de la mise à jour.</h2>
-        <p className="microcopy">La mise à jour macOS prend environ 8 min et demande un redémarrage. Ton prochain meeting est à 11:30 : ce sera fini bien avant.</p>
+        <p className="microcopy">
+          La mise à jour macOS prend environ 8 min et demande un redémarrage.
+          {next ? ` Ton prochain meeting est à ${next.start} : ce sera fini bien avant.` : ""}
+        </p>
       </div>
-      <motion.div {...reveal(0.1)} className="mini-blocks">
-        <div><time>10:45</time><span>Sauvegarde des fenêtres ouvertes</span></div>
-        <div><time>10:46</time><span>Mise à jour + redémarrage</span></div>
-        <div><time>10:55</time><span>Réouverture de tes apps</span></div>
-      </motion.div>
+      {result ? (
+        <p className="microcopy llm-status" data-ok={result[0]?.status !== "failed"}>{result[0]?.detail} · visible dans le journal.</p>
+      ) : (
+        <motion.div {...reveal(0.1)} className="mini-blocks">
+          <div><time>{free.start}</time><span>Sauvegarde des fenêtres ouvertes</span></div>
+          <div><time>{add(free.start, 1)}</time><span>Mise à jour + redémarrage</span></div>
+          <div><time>{add(free.start, 10)}</time><span>Réouverture de tes apps</span></div>
+        </motion.div>
+      )}
       <div className="popup-footer">
-        <button className="mode-toggle" onClick={() => window.api.closePopup()}>Pas maintenant</button>
-        <button className="run-button" onClick={() => window.api.popupAnswer("coffee", { accepted: true })}>Vas-y</button>
+        {result ? (
+          <button className="run-button" onClick={() => window.api.closePopup()}>Fermer</button>
+        ) : (
+          <>
+            <button className="mode-toggle" onClick={() => window.api.closePopup()}>Pas maintenant</button>
+            <button className="run-button" onClick={go}>Vas-y</button>
+          </>
+        )}
       </div>
     </>
   );

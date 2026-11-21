@@ -1,0 +1,29 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Preflight//Demo LauzHack//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:demo-sync@preflight
+DTSTAMP:20261121T080000Z
+DTSTART:20261123T100000
+DTEND:20261123T104500
+SUMMARY:Sync équipe produit
+DESCRIPTION:Rejoindre la réunion Microsoft Teams : https://teams.microsoft.com/l/meetup-join/preflight-demo-sync
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-budget@preflight
+DTSTAMP:20261121T080000Z
+DTSTART:20261123T113000
+DTEND:20261123T120000
+SUMMARY:Revue budget avec Finance
+DESCRIPTION:Document : budget_q4.xlsx (Excel). Teams : https://teams.microsoft.com/l/meetup-join/preflight-demo-budget
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-1on1@preflight
+DTSTAMP:20261121T080000Z
+DTSTART:20261123T150000
+DTEND:20261123T153000
+SUMMARY:1:1 avec Sarah
+DESCRIPTION:Zoom : https://epfl.zoom.us/j/123456789
+END:VEVENT
+END:VCALENDAR

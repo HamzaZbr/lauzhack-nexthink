@@ -3,22 +3,30 @@
  * quand le LLM sera branché (bloc 1), il choisira parmi ces mêmes outils, et si l'appel
  * échoue ou dépasse le délai, c'est ce plan qui s'affiche.
  */
-import { getDay } from "./day";
+import { getDay, getMaintenanceSlot, toMin } from "./day";
+import { now } from "./clock";
 import { appMatches, isProtected } from "../shared/apps";
 import { riskOf } from "./actions";
 import { takeSnapshot } from "./sensors";
 import type { ActionRequest, DayBlock, PreflightPlan, ProposedAction } from "../shared/types";
 
-/** Prochain bloc « meeting » de la journée (pour l'instant : les données de démo). */
+const nowMin = () => {
+  const d = now();
+  return d.getHours() * 60 + d.getMinutes();
+};
+
+/** Prochain meeting selon l'horloge (celui en cours compte encore), sinon le premier de la journée. */
 export function nextBlock(): DayBlock {
   const day = getDay();
-  return day.find((b) => b.kind === "meeting") ?? day[0];
+  const meetings = day.filter((b) => b.kind === "meeting");
+  return meetings.find((b) => toMin(b.end) > nowMin()) ?? meetings[0] ?? day[0];
 }
 
 const HEAVY_MB = 500;
 
 export async function planPreflight(): Promise<PreflightPlan> {
   const block = nextBlock();
+  if (!block) throw new Error("Aucun meeting dans la journée.");
   const snapshot = await takeSnapshot(true);
   const actions: ProposedAction[] = [];
   let n = 0;
@@ -62,12 +70,12 @@ export async function planPreflight(): Promise<PreflightPlan> {
     .forEach((w) => add({ tool: "open_app", target: w === "Teams" ? "Microsoft Teams" : w }, `Nécessaire pour « ${block.title} ».`));
 
   // 6. Mise à jour système (démo) : jamais pendant un meeting, proposée pour le prochain créneau libre
-  const free = getDay().find((b) => b.kind === "free");
+  const free = getMaintenanceSlot();
   if (free)
     add(
       { tool: "install_update", target: `Mise à jour macOS à ${free.start}` },
       `Redémarrage nécessaire (~8 min) : je la place pendant ton créneau libre ${free.start}–${free.end}. Simulée dans ce prototype.`,
     );
 
-  return { block, minutesBefore: 5, actions, snapshot };
+  return { block, minutesBefore: Math.max(0, toMin(block.start) - nowMin()), actions, snapshot };
 }

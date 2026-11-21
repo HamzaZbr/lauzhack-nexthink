@@ -27,6 +27,19 @@ export interface ProposedAction {
   args?: Record<string, unknown>;
 }
 
+export interface CalendarInfo {
+  source: "demo" | "url" | "file";
+  label: string;
+  events: number;
+  error?: string;
+  loadedAt?: string;
+}
+
+export interface ClockState {
+  hhmm: string;
+  demo: boolean;
+}
+
 export interface DayPlanResult {
   blocks: DayBlock[];
   summary: string;
@@ -136,5 +149,9 @@ export interface PreflightApi {
   journal(): Promise<ActionLogEntry[]>;
   day(): Promise<DayBlock[]>;
   planDay(text: string): Promise<DayPlanResult>;
+  calendarInfo(): Promise<CalendarInfo>;
+  reloadCalendar(): Promise<CalendarInfo>;
+  clock(): Promise<ClockState>;
+  setClock(hhmm: string | null): Promise<ClockState>;
   onEvent(cb: (event: { type: string; payload?: unknown }) => void): () => void;
 }

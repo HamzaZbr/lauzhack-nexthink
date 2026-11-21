@@ -1,12 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { BarChart3, CalendarClock, ChevronDown, Cpu, Moon, ScrollText, Sparkles, Sun, Zap } from "lucide-react";
+import { BarChart3, CalendarClock, ChevronDown, Clock, Cpu, Moon, ScrollText, Sparkles, Sun, Zap } from "lucide-react";
 import { useEffect, useState, type ComponentType } from "react";
 import { InteractiveLabel } from "./motion/primitives";
 import { Today } from "./views/Today";
 import { MyPc } from "./views/MyPc";
 import { Journal } from "./views/Journal";
 import { Week } from "./views/Week";
-import type { AppInfo, LlmPingResult } from "@shared/types";
+import type { AppInfo, ClockState, LlmPingResult } from "@shared/types";
 
 export type View = "today" | "pc" | "journal" | "week";
 type Theme = "light" | "dark";
@@ -141,6 +141,8 @@ function Sidebar({ view, setView, theme, setTheme }: { view: View; setView: (v: 
         ))}
       </nav>
 
+      <DemoClock />
+
       <div className="sidebar-controls">
         <button className="mode-toggle" onClick={testLlm} disabled={pinging}>
           <Sparkles size={14} />
@@ -160,5 +162,48 @@ function Sidebar({ view, setView, theme, setTheme }: { view: View; setView: (v: 
         </span>
       </div>
     </aside>
+  );
+}
+
+/** Horloge de démo : régler l'heure de l'app pour déclencher les pop-ups pendant le pitch. */
+const DEMO_TIMES = [
+  { hhmm: "08:30", label: "brief" },
+  { hhmm: "09:55", label: "pre-flight" },
+  { hhmm: "10:45", label: "café" },
+];
+
+function DemoClock() {
+  const [clock, setClock] = useState<ClockState | null>(null);
+  useEffect(() => {
+    const read = () => window.api.clock().then(setClock);
+    void read();
+    const t = setInterval(read, 15_000);
+    const off = window.api.onEvent((e) => {
+      if (e.type === "clock-updated") setClock(e.payload as ClockState);
+    });
+    return () => {
+      clearInterval(t);
+      off();
+    };
+  }, []);
+
+  const set = async (hhmm: string | null) => {
+    setClock(await window.api.setClock(hhmm));
+    if (hhmm === "08:30") void window.api.openPopup("morning");
+  };
+
+  return (
+    <div className="demo-clock">
+      <p className="section-trigger"><Clock size={13} /> Horloge {clock?.demo ? "· démo" : ""}</p>
+      <strong className="demo-time">{clock?.hhmm ?? "--:--"}</strong>
+      <div className="demo-buttons">
+        {DEMO_TIMES.map((t) => (
+          <button key={t.hhmm} className="filter-chip" data-active={clock?.hhmm === t.hhmm} onClick={() => set(t.hhmm)} title={`Mettre l'horloge à ${t.hhmm}`}>
+            {t.hhmm} <span className="microcopy">{t.label}</span>
+          </button>
+        ))}
+        {clock?.demo ? <button className="filter-chip" onClick={() => set(null)}>heure réelle</button> : null}
+      </div>
+    </div>
   );
 }

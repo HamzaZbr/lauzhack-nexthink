@@ -74,6 +74,13 @@ affiche « fait / simulé / échec »
 6. Si le LLM échoue (erreur, plus de 12 s, rien de valide) → **plan de secours** : un bloc de 45 min par morceau de phrase.
 7. La journée est mise à jour : la timeline, l'arbre et le prochain pre-flight utilisent les nouveaux blocs.
 
+## 3 ter. Ce qui se passe quand tu cliques sur « 09:55 » (démo)
+
+1. La sidebar appelle `window.api.setClock("09:55")` → `clock.ts` décale l'horloge de l'app (le temps continue ensuite à s'écouler).
+2. `scheduler.ts` revérifie tout de suite : il est 09:55, « Sync équipe produit » commence à 10:00, donc on est dans les 5 min → **ouvre le pop-up pre-flight**.
+3. Le pre-flight demande son plan : `planner.ts` prend le **prochain meeting selon l'horloge**, lit le Mac, propose les actions.
+4. En dehors de la démo, c'est exactement pareil avec la vraie heure : le planificateur tourne toutes les 15 s.
+
 ## 4. Le rôle de chaque fichier
 
 ### `src/main/` : le cerveau (Node.js)
@@ -86,14 +93,17 @@ affiche « fait / simulé / échec »
 | `planner.ts` | Construit le plan du pre-flight à partir du prochain bloc + de la photo du Mac (règles) |
 | `llm.ts` | Appelle Together AI et force une réponse JSON qui suit un schéma |
 | `agent.ts` | Ce que fait le LLM : le brief du matin (phrase → blocs), avec vérification et plan de secours |
-| `day.ts` | La journée : calendrier + tâches du matin, calcul des créneaux libres |
-| `clock.ts` | Horloge décalable pour la démo (pas encore utilisée) |
+| `day.ts` | La journée : meetings + créneau de maintenance calculé + tâches du matin ; créneaux libres pour le brief |
+| `clock.ts` | Horloge de l'app, décalable pour la démo (boutons 08:30 / 09:55 / 10:45 dans la sidebar) |
+| `calendar.ts` | Charge le calendrier : lien ICS (`CALENDAR_ICS_URL`), fichier, ou `resources/demo.ics` ; recharge toutes les 10 min |
+| `ics.ts` | Lit un `.ics` → meetings du jour (récurrences, fuseaux Outlook, liens Teams/Zoom, apps devinées) |
+| `scheduler.ts` | Toutes les 15 s : ouvre le pre-flight 5 min avant un meeting, le café au début du créneau libre |
 
 ### `src/shared/` : ce que main et UI partagent
 | Fichier | Rôle |
 |---|---|
 | `types.ts` | Toutes les formes de données (bloc de journée, action, photo du Mac, entrée de journal) |
-| `mock.ts` | La journée de démo (sera remplacée par le `.ics`) |
+| `mock.ts` | Ancienne journée d'exemple (plus utilisée par l'app, remplacée par `resources/demo.ics`) |
 | `apps.ts` | Apps protégées, apps « à documents », correspondance « Teams » ↔ « Microsoft Teams » |
 | `tree.ts` | Construit l'arbre « pourquoi » (blocs → apps → onglets par site) à partir de la journée et de la photo du Mac |
 

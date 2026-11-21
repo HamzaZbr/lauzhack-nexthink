@@ -12,6 +12,9 @@ import { planPreflight } from "./planner";
 import { takeSnapshot } from "./sensors";
 import { getDay, onDayChange } from "./day";
 import { planDay } from "./agent";
+import { calendarInfo, loadCalendar } from "./calendar";
+import { clockState, setDemoTime } from "./clock";
+import { resetScheduler, startScheduler } from "./scheduler";
 import type { ActionRequest, PopupKind } from "../shared/types";
 
 loadEnv({ path: join(app.getAppPath(), ".env") });
@@ -56,12 +59,23 @@ function registerIpc() {
   ipcMain.handle("journal:list", () => getJournal());
   ipcMain.handle("day:get", () => getDay());
   ipcMain.handle("day:plan", (_e, text: string) => planDay(String(text ?? "").slice(0, 500)));
+  ipcMain.handle("calendar:info", () => calendarInfo());
+  ipcMain.handle("calendar:reload", () => loadCalendar());
+  ipcMain.handle("clock:get", () => clockState());
+  ipcMain.handle("clock:set", (_e, value: string | null) => {
+    setDemoTime(typeof value === "string" && /^\d{2}:\d{2}$/.test(value) ? value : null);
+    toDashboard("clock-updated", clockState());
+    resetScheduler();
+    return clockState();
+  });
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   initJournal((journal) => toDashboard("journal-updated", journal));
   onDayChange((day) => toDashboard("day-updated", day));
   registerIpc();
+  await loadCalendar();
+  startScheduler();
   createTray();
   showDashboard();
   // « Dès que le PC s'allume » : le brief du matin s'ouvre au lancement.

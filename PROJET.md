@@ -1,7 +1,7 @@
 # Preflight : objectif et avancement
 
 > Fichier de référence. Si tu te perds, reviens ici.
-> Dernière mise à jour : samedi 21/11, 19h20.
+> Dernière mise à jour : samedi 21/11, 19h45.
 
 ## L'objectif en une phrase
 
@@ -24,6 +24,16 @@ Un employé de bureau avec une journée chargée de meetings, sur son propre pos
 5. « Voir pourquoi » ouvre l'**arbre** : ta journée d'un côté, ce qui tourne sur ton Mac de l'autre.
 6. **Pause café** : la mise à jour est placée dans le créneau libre, pas pendant le meeting.
 7. **Semaine** : ce que l'agent t'a fait gagner.
+
+## Le scénario de démo (avec l'horloge)
+
+1. Lancer l'app. Dans la sidebar : **08:30** → le brief s'ouvre. Taper « finir le rapport Q4 cet aprem, note de frais » → l'IA place les tâches.
+2. **09:55** → le pre-flight s'ouvre **tout seul** pour « Sync équipe produit » (10:00). Montrer les risques, cliquer « Voir pourquoi » (arbre), puis « Préparer ».
+3. **Journal** → les actions faites, cliquer « Annuler » sur l'une d'elles.
+4. **10:45** → la pause café s'ouvre toute seule : la mise à jour est placée avant le meeting de 11:30.
+5. **Semaine** → ce que l'agent t'a fait gagner.
+
+Avant la démo : `PREFLIGHT_DRY_RUN=0` dans `.env`, Spotify ouvert, quelques onglets en double, Docker fermé si des conteneurs comptent.
 
 ## Comment ça colle à la grille du jury
 
@@ -75,10 +85,13 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire
 - [x] Page Mon PC (vraies données + arbre), page Journal (vraies actions), pop-up pre-flight (vrai plan)
 - [x] Arbre v2 : 3 colonnes (blocs → apps → onglets par site), apps à ouvrir en pointillés, barre de RAM, clic sur un nœud → détail + action (fermer / ouvrir)
 
-### Calendrier et horloge (prochaine étape)
-- [ ] Lire un fichier `.ics` (faux calendrier de démo) à la place des données d'exemple
-- [ ] Horloge de démo : régler l'heure à 09:55 pour déclencher le pre-flight pendant le pitch
-- [ ] Planificateur : ouvrir le pre-flight tout seul 5 min avant chaque meeting
+### Calendrier et horloge
+- [x] Calendrier `.ics` : démo (`resources/demo.ics`) ou vrai lien ICS Outlook/Google (`CALENDAR_ICS_URL`), réunions récurrentes comprises
+- [x] Liens Teams/Zoom/Webex/Meet extraits des invitations → apps nécessaires + « Rejoindre le meeting »
+- [x] Créneau de maintenance calculé (premier trou entre deux meetings)
+- [x] Horloge de démo dans la sidebar (08:30 brief · 09:55 pre-flight · 10:45 café · heure réelle)
+- [x] Planificateur : pre-flight tout seul 5 min avant chaque meeting, café au début du créneau libre
+- [ ] Tester avec ton vrai lien ICS (Outlook EPFL ou Google)
 
 ### Bloc 1 : LLM (21:30–23:30)
 - [x] Brief du matin : le LLM découpe la phrase en blocs placés dans les créneaux libres, avec les apps (+ plan de secours sans IA)

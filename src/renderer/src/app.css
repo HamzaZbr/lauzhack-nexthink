@@ -116,3 +116,12 @@ button, input, textarea, select, a { -webkit-app-region: no-drag; }
 .divider { height: 1px; margin: 16px 0; background: var(--np-dash, var(--np-line)); }
 .graph-layout { grid-template-columns: minmax(0, 1fr) 320px; }
 .graph-layout .graph-stage { height: min(78vh, 860px); }
+
+/* Horloge de démo (sidebar) */
+.demo-clock { margin-top: 28px; display: grid; gap: 8px; }
+.demo-clock .section-trigger { margin: 0; }
+.demo-time { color: var(--np-strong); font-size: var(--np-size-4); font-weight: var(--np-weight-strong); font-variant-numeric: tabular-nums; }
+.demo-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+.demo-buttons .filter-chip { min-height: 28px; padding: 0 8px; font-size: var(--np-size-0); }
+.demo-buttons .microcopy { margin-left: 2px; }
+.toolbar-row .filter-chip { min-height: 28px; padding: 0 10px; font-size: var(--np-size-0); }
