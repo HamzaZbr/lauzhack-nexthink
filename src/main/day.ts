@@ -5,6 +5,10 @@
  * - les tâches ajoutées le matin (agent.ts, brief du matin).
  */
 import type { DayBlock } from "../shared/types";
+import { resolveApps } from "./installed";
+
+/** « Excel » sur un Mac sans Office → « Numbers », Teams absent → retiré (le lien s'ouvre dans le navigateur). */
+const withInstalledApps = (blocks: DayBlock[]) => blocks.map((b) => ({ ...b, apps: resolveApps(b.apps) }));
 
 let calendar: DayBlock[] = [];
 let morning: DayBlock[] = [];
@@ -52,7 +56,7 @@ export const onDayChange = (listener: (day: DayBlock[]) => void) => {
 };
 
 export function setMorningBlocks(blocks: DayBlock[]) {
-  morning = blocks;
+  morning = withInstalledApps(blocks);
   onChange(getDay());
 }
 
@@ -62,7 +66,7 @@ export function clearMorning() {
 }
 
 export function setCalendar(blocks: DayBlock[]) {
-  calendar = blocks;
+  calendar = withInstalledApps(blocks);
   onChange(getDay());
 }
 

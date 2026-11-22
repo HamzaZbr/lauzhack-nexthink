@@ -19,6 +19,7 @@ import { join } from "node:path";
 import { takeSnapshot, tabsScope } from "./sensors";
 import { now } from "./clock";
 import { isDocumentApp, isProtected } from "../shared/apps";
+import { TEMPLATES, isTemplateId, meetingNotes, newFromTemplate } from "./documents";
 import type { ActionLogEntry, ActionRequest, Risk, ToolInfo } from "../shared/types";
 
 const run = promisify(execFile);
@@ -38,7 +39,19 @@ interface ToolDef extends ToolInfo {
   /** Lève une erreur si la demande n'est pas valide. */
   validate: (req: ActionRequest) => Promise<void>;
   execute: (req: ActionRequest) => Promise<Outcome>;
+  /**
+   * Ne fait que CRÉER un nouveau fichier dans Documents/Preflight (rien d'existant n'est touché) :
+   * exécuté même en simulation, puisque c'est l'utilisateur qui l'a demandé (raccourci ou case cochée).
+   */
+  createsOnly?: boolean;
 }
+
+/** Annuler une création : le fichier part à la Corbeille (récupérable). */
+const trashFile = (path: string) => async () => {
+  await osa(["on run argv", 'tell application "Finder" to delete (POSIX file (item 1 of argv) as alias)', "end run"], [path]);
+  return "Fichier mis à la Corbeille.";
+};
+const shortPath = (p: string) => p.replace(homedir(), "~");
 
 const osa = (lines: string[], argv: string[] = []) =>
   run("osascript", [...lines.flatMap((l) => ["-e", l]), ...argv], { timeout: 10_000 });
@@ -103,6 +116,47 @@ const tools: ToolDef[] = [
       if (typeof req.args?.summary !== "string" || req.args.summary.length > 800) throw new Error("Résumé des besoins invalide.");
     },
     execute: async (req) => ({ detail: String(req.args?.summary), items: Math.max(0, Math.min(10, Number(req.args?.alerts) || 0)) }),
+  },
+  {
+    tool: "new_from_template",
+    label: "Nouveau document au modèle de l'entreprise",
+    risk: "confirm",
+    createsOnly: true,
+    description: "Crée une présentation, un rapport ou un tableau au modèle Lémanic dans Documents/Preflight et l'ouvre.",
+    validate: async (req) => {
+      if (!isTemplateId(req.target)) throw new Error("Modèle inconnu.");
+    },
+    execute: async (req) => {
+      const id = req.target as keyof typeof TEMPLATES;
+      const { path, opened } = await newFromTemplate(id);
+      return { detail: `${TEMPLATES[id].name} créée et ouverte dans ${opened} : ${shortPath(path)}`, undo: trashFile(path) };
+    },
+  },
+  {
+    tool: "meeting_notes",
+    label: "Notes de réunion pré-remplies",
+    risk: "confirm",
+    createsOnly: true,
+    description: "Crée des notes de réunion pré-remplies (titre, date, participants, ordre du jour) dans Documents/Preflight et les ouvre.",
+    validate: async (req) => {
+      const a = req.args ?? {};
+      if (typeof a.title !== "string" || !a.title || a.title.length > 120) throw new Error("Titre de meeting invalide.");
+      if (typeof a.start !== "string" || typeof a.end !== "string" || typeof a.date !== "string") throw new Error("Heure du meeting invalide.");
+      if (a.attendees !== undefined && !(Array.isArray(a.attendees) && a.attendees.every((x) => typeof x === "string"))) throw new Error("Participants invalides.");
+    },
+    execute: async (req) => {
+      const a = req.args as Record<string, unknown>;
+      const { path, opened } = await meetingNotes({
+        title: String(a.title),
+        date: String(a.date),
+        start: String(a.start),
+        end: String(a.end),
+        location: typeof a.location === "string" ? a.location.slice(0, 120) : undefined,
+        attendees: (a.attendees as string[] | undefined)?.slice(0, 20).map((x) => x.slice(0, 80)),
+        agenda: typeof a.agenda === "string" ? a.agenda.slice(0, 600) : undefined,
+      });
+      return { detail: `Notes créées et ouvertes dans ${opened} : ${shortPath(path)}`, undo: trashFile(path) };
+    },
   },
   {
     tool: "quit_app",
@@ -340,11 +394,12 @@ export async function runActions(requests: ActionRequest[]): Promise<ActionLogEn
       undoable: false,
     };
     if (req.tool === "clean_cache" && Object.hasOwn(CACHE_DIRS, req.target)) entry.title = CACHE_DIRS[req.target].label;
+    if (req.tool === "new_from_template" && isTemplateId(req.target)) entry.title = TEMPLATES[req.target].name;
     try {
       if (!def) throw new Error(`Outil inconnu : ${req.tool}`);
       await def.validate(req);
       // La lecture seule s'exécute toujours ; le reste est simulé tant que PREFLIGHT_DRY_RUN n'est pas à 0.
-      if (dryRun() && def.risk !== "auto") {
+      if (dryRun() && def.risk !== "auto" && !def.createsOnly) {
         entry.status = "simulated";
         entry.detail = `Simulation : ${def.label.toLowerCase()} → ${entry.title ?? req.target}`;
         if (req.tool === "close_tabs" && Array.isArray(req.args?.urls)) entry.items = (req.args!.urls as unknown[]).length;

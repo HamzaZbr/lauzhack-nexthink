@@ -181,3 +181,20 @@ Oui, lis-en une partie : le jury va te poser des questions sur **comment** l'age
 - **Snapshot** : une photo de l'état du Mac à un instant donné.
 - **Dry run** : mode simulation, les actions sont journalisées mais pas exécutées.
 - **Serverless (Together)** : modèle utilisable directement avec ta clé, sans louer un serveur dédié.
+
+## Ajouts de la nuit du 22 novembre
+
+| Fichier | Rôle |
+|---|---|
+| `src/main/installed.ts` | Apps réellement installées : « Excel » → Numbers sur un Mac sans Office, Teams absent → retiré |
+| `src/main/documents.ts` | Modèles de l'entreprise (Lémanic SA, inventée) copiés dans `~/Documents/Preflight` et ouverts ; notes de réunion pré-remplies (HTML → `.docx` avec `textutil`, l'outil intégré à macOS) |
+| `src/main/shortcuts.ts` | Raccourcis clavier globaux (⌃⌥P/R/T/N), activés depuis la page Raccourcis, exécutés par le registre d'actions (donc journalisés) |
+| `src/shared/shortcuts.ts` | Définitions des raccourcis + repérage des routines dans le journal d'usage (pur, testable) |
+| `src/renderer/src/views/Shortcuts.tsx` | Page Raccourcis [3] : routines repérées, avant/après, activer, essayer |
+| `src/renderer/src/mascot/Mascot.tsx` | La mascotte (fenêtre transparente toujours devant, `#/mascot`) |
+| `resources/templates/*` | Modèles présentation (.pptx), rapport (.docx), tableau (.xlsx) |
+| `resources/usage-demo.json` | Journal d'usage **simulé** (démo) d'où sont tirées les routines |
+
+**Règle de sécurité ajoutée :** les outils `new_from_template` et `meeting_notes` ne font que **créer un nouveau fichier** dans `~/Documents/Preflight` (rien d'existant n'est modifié). Ils sont donc exécutés même en simulation, puisque c'est toi qui les déclenches (raccourci ou case cochée). Annuler les met à la Corbeille.
+
+**Tri des onglets :** en plus du LLM, `tabs.ts` garde toujours les sites de travail connus (GitHub, Stack Overflow, docs, `*.epfl.ch`, arXiv, Hugging Face, Notion…) et les vidéos YouTube de tuto ou de cours. `WORK_SITES` dans `.env` pour en ajouter.

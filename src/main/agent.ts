@@ -10,7 +10,7 @@ import { learnedPreferences } from "./prefs";
 import { durationMin, mergeNeeds, needsFromText } from "../shared/needs";
 import type { BlockNeeds, ChromeTab, DayBlock, DayPlanResult, TabVerdict, TriageInfo } from "../shared/types";
 
-const COMMON_APPS = ["Outlook", "Microsoft Teams", "Excel", "Word", "PowerPoint", "Google Chrome", "Slack", "Notion", "Figma", "Visual Studio Code"];
+const COMMON_APPS = ["Outlook", "Microsoft Teams", "Excel", "Word", "PowerPoint", "Numbers", "Pages", "Keynote", "Google Chrome", "Slack", "Notion", "Figma", "Visual Studio Code"];
 
 const DAY_SCHEMA = {
   type: "object",
@@ -217,7 +217,7 @@ const BATCH = 25;
  */
 async function triageTabs(tabs: ChromeTab[], block: DayBlock | null): Promise<TriageResult> {
   const started = Date.now();
-  const tabsModel = process.env.TOGETHER_TABS_MODEL || model();
+  const tabsModel = process.env.TOGETHER_TABS_MODEL || "openai/gpt-oss-120b"; // le meilleur au bench (0 erreur grave)
   const sendTitles = process.env.TABS_SEND_TITLES !== "0";
   const list = tabs.slice(0, 120);
   const others = getDay()

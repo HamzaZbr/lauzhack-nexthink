@@ -4,6 +4,8 @@ PRODID:-//Preflight//Demo LauzHack//FR
 CALSCALE:GREGORIAN
 BEGIN:VEVENT
 UID:demo-sync@preflight
+ATTENDEE;CN=Sarah Keller;ROLE=REQ-PARTICIPANT:mailto:sarah@lemanic.example
+ATTENDEE;CN=Marc Dubois;ROLE=REQ-PARTICIPANT:mailto:marc@lemanic.example
 DTSTAMP:20261121T080000Z
 DTSTART:20261123T100000
 DTEND:20261123T104500
@@ -12,6 +14,8 @@ DESCRIPTION:Rejoindre la réunion Microsoft Teams : https://teams.microsoft.com/
 END:VEVENT
 BEGIN:VEVENT
 UID:demo-budget@preflight
+ATTENDEE;CN=Claire Martin (Finance);ROLE=REQ-PARTICIPANT:mailto:claire@lemanic.example
+ATTENDEE;CN=Sarah Keller;ROLE=REQ-PARTICIPANT:mailto:sarah@lemanic.example
 DTSTAMP:20261121T080000Z
 DTSTART:20261123T113000
 DTEND:20261123T120000
@@ -20,6 +24,7 @@ DESCRIPTION:Tu présentes les chiffres du trimestre au projecteur\, salle BC 410
 END:VEVENT
 BEGIN:VEVENT
 UID:demo-1on1@preflight
+ATTENDEE;CN=Sarah Keller;ROLE=REQ-PARTICIPANT:mailto:sarah@lemanic.example
 DTSTAMP:20261121T080000Z
 DTSTART:20261123T150000
 DTEND:20261123T153000

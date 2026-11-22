@@ -22,6 +22,9 @@ END:DAYLIGHT
 END:VTIMEZONE
 BEGIN:VEVENT
 UID:preflight-sync-20261122@lauzhack
+ATTENDEE;CN=Sarah Keller;ROLE=REQ-PARTICIPANT:mailto:sarah@lemanic.example
+ATTENDEE;CN=Marc Dubois;ROLE=REQ-PARTICIPANT:mailto:marc@lemanic.example
+ATTENDEE;CN=Hamza Zoubayri;ROLE=REQ-PARTICIPANT:mailto:hamza@lemanic.example
 DTSTAMP:20261122T000000Z
 DTSTART;TZID=Europe/Zurich:20261122T100000
 DTEND;TZID=Europe/Zurich:20261122T104500
@@ -31,6 +34,9 @@ DESCRIPTION:Ordre du jour : avancement de la démo\, répartition du travail.\nR
 END:VEVENT
 BEGIN:VEVENT
 UID:preflight-budget-20261122@lauzhack
+ATTENDEE;CN=Claire Martin (Finance);ROLE=REQ-PARTICIPANT:mailto:claire@lemanic.example
+ATTENDEE;CN=Sarah Keller;ROLE=REQ-PARTICIPANT:mailto:sarah@lemanic.example
+ATTENDEE;CN=Hamza Zoubayri;ROLE=REQ-PARTICIPANT:mailto:hamza@lemanic.example
 DTSTAMP:20261122T000000Z
 DTSTART;TZID=Europe/Zurich:20261122T113000
 DTEND;TZID=Europe/Zurich:20261122T120000
@@ -40,6 +46,8 @@ DESCRIPTION:Tu présentes les chiffres du trimestre au projecteur. Document : bu
 END:VEVENT
 BEGIN:VEVENT
 UID:preflight-pitch-20261122@lauzhack
+ATTENDEE;CN=Jury Nexthink;ROLE=REQ-PARTICIPANT:mailto:jury@lemanic.example
+ATTENDEE;CN=Hamza Zoubayri;ROLE=REQ-PARTICIPANT:mailto:hamza@lemanic.example
 DTSTAMP:20261122T000000Z
 DTSTART;TZID=Europe/Zurich:20261122T123000
 DTEND;TZID=Europe/Zurich:20261122T124500
@@ -49,6 +57,8 @@ DESCRIPTION:Présenter Preflight au jury Nexthink : démo live sur écran extern
 END:VEVENT
 BEGIN:VEVENT
 UID:preflight-1on1-20261122@lauzhack
+ATTENDEE;CN=Sarah Keller;ROLE=REQ-PARTICIPANT:mailto:sarah@lemanic.example
+ATTENDEE;CN=Hamza Zoubayri;ROLE=REQ-PARTICIPANT:mailto:hamza@lemanic.example
 DTSTAMP:20261122T000000Z
 DTSTART;TZID=Europe/Zurich:20261122T150000
 DTEND;TZID=Europe/Zurich:20261122T153000
@@ -58,6 +68,9 @@ DESCRIPTION:Point hebdo : retours sur le rapport\, priorités de la semaine.\nZo
 END:VEVENT
 BEGIN:VEVENT
 UID:preflight-daily-20261123@lauzhack
+ATTENDEE;CN=Sarah Keller;ROLE=REQ-PARTICIPANT:mailto:sarah@lemanic.example
+ATTENDEE;CN=Marc Dubois;ROLE=REQ-PARTICIPANT:mailto:marc@lemanic.example
+ATTENDEE;CN=Hamza Zoubayri;ROLE=REQ-PARTICIPANT:mailto:hamza@lemanic.example
 DTSTAMP:20261122T000000Z
 DTSTART;TZID=Europe/Zurich:20261123T090000
 DTEND;TZID=Europe/Zurich:20261123T093000
@@ -67,6 +80,9 @@ DESCRIPTION:Tour de table : hier\, aujourd'hui\, blocages.\nRejoindre la réunio
 END:VEVENT
 BEGIN:VEVENT
 UID:preflight-comite-20261123@lauzhack
+ATTENDEE;CN=Direction Lémanic;ROLE=REQ-PARTICIPANT:mailto:direction@lemanic.example
+ATTENDEE;CN=Claire Martin (Finance);ROLE=REQ-PARTICIPANT:mailto:claire@lemanic.example
+ATTENDEE;CN=Hamza Zoubayri;ROLE=REQ-PARTICIPANT:mailto:hamza@lemanic.example
 DTSTAMP:20261122T000000Z
 DTSTART;TZID=Europe/Zurich:20261123T103000
 DTEND;TZID=Europe/Zurich:20261123T113000
@@ -76,6 +92,8 @@ DESCRIPTION:Tu présentes les résultats du trimestre au projecteur. Support : r
 END:VEVENT
 BEGIN:VEVENT
 UID:preflight-workshop-20261123@lauzhack
+ATTENDEE;CN=Équipe sécurité IT;ROLE=REQ-PARTICIPANT:mailto:équipe@lemanic.example
+ATTENDEE;CN=Hamza Zoubayri;ROLE=REQ-PARTICIPANT:mailto:hamza@lemanic.example
 DTSTAMP:20261122T000000Z
 DTSTART;TZID=Europe/Zurich:20261123T140000
 DTEND;TZID=Europe/Zurich:20261123T160000
@@ -85,6 +103,8 @@ DESCRIPTION:Atelier pratique sur ton laptop (2 h\, peu de prises dans la salle).
 END:VEVENT
 BEGIN:VEVENT
 UID:preflight-1on1-20261123@lauzhack
+ATTENDEE;CN=Sarah Keller;ROLE=REQ-PARTICIPANT:mailto:sarah@lemanic.example
+ATTENDEE;CN=Hamza Zoubayri;ROLE=REQ-PARTICIPANT:mailto:hamza@lemanic.example
 DTSTAMP:20261122T000000Z
 DTSTART;TZID=Europe/Zurich:20261123T163000
 DTEND;TZID=Europe/Zurich:20261123T170000

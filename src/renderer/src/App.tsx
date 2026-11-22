@@ -1,25 +1,27 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { BarChart3, CalendarClock, ChevronDown, Clock, Cpu, Moon, ScrollText, Sparkles, Sun, Zap } from "lucide-react";
+import { BarChart3, CalendarClock, ChevronDown, Clock, Cpu, Keyboard, Moon, ScrollText, Sparkles, Sun, Zap } from "lucide-react";
 import { useEffect, useState, type ComponentType } from "react";
 import { InteractiveLabel } from "./motion/primitives";
 import { Today } from "./views/Today";
 import { MyPc } from "./views/MyPc";
 import { Journal } from "./views/Journal";
 import { Week } from "./views/Week";
+import { Shortcuts } from "./views/Shortcuts";
 import type { AppInfo, ClockState, DayBlock, LlmPingResult } from "@shared/types";
 
-export type View = "today" | "pc" | "journal" | "week";
+export type View = "today" | "pc" | "shortcuts" | "journal" | "week";
 type Theme = "light" | "dark";
 
 const viewMeta: Record<View, { label: string; key: string; icon: ComponentType<{ size?: number }>; lead: string }> = {
   today: { label: "Aujourd'hui", key: "1", icon: CalendarClock, lead: "Ta journée telle que l'agent la voit : le calendrier, tes tâches du matin, et ce qu'il prépare avant chaque bloc." },
   pc: { label: "Mon PC", key: "2", icon: Cpu, lead: "Ce qui tourne sur ta machine, rangé selon ta journée. Ce qui ne sert à rien aujourd'hui est mis en évidence." },
-  journal: { label: "Journal", key: "3", icon: ScrollText, lead: "Chaque action de l'agent, avec la raison et un bouton pour l'annuler." },
-  week: { label: "Semaine", key: "4", icon: BarChart3, lead: "Ce que Preflight t'a fait gagner cette semaine." },
+  shortcuts: { label: "Raccourcis", key: "3", icon: Keyboard, lead: "Ce que tu refais à la main chaque semaine, remplacé par une touche : documents au modèle de l'entreprise, notes de réunion pré-remplies." },
+  journal: { label: "Journal", key: "4", icon: ScrollText, lead: "Chaque action de l'agent, avec la raison et un bouton pour l'annuler." },
+  week: { label: "Semaine", key: "5", icon: BarChart3, lead: "Ce que Preflight t'a fait gagner cette semaine." },
 };
 
 const sections: Array<{ label: string; items: View[] }> = [
-  { label: "Journée", items: ["today", "pc"] },
+  { label: "Journée", items: ["today", "pc", "shortcuts"] },
   { label: "Historique", items: ["journal", "week"] },
 ];
 
@@ -79,6 +81,7 @@ export function App({ initialView }: { initialView?: string }) {
           >
             {view === "today" ? <Today /> : null}
             {view === "pc" ? <MyPc /> : null}
+            {view === "shortcuts" ? <Shortcuts /> : null}
             {view === "journal" ? <Journal /> : null}
             {view === "week" ? <Week /> : null}
           </motion.div>

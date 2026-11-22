@@ -75,24 +75,23 @@ L'app lit l'invitation (titre, description, lieu). Sans indice, elle ne sait pas
 
 **Agenda de démo sur deux jours :** `resources/outlook-preflight-22-23nov.ics` (dimanche 22 + lundi 23). À importer dans Outlook, ou à lire directement : `CALENDAR_ICS_FILE=/Users/hamza/Desktop/bsa/lauzhack-nexthink/resources/outlook-preflight-22-23nov.ics`. Le bouton **demain 08:30** de l'horloge passe au lundi : meetings du lundi, tâches de la veille oubliées, ce qui restait repris dans le brief.
 
-## 4. Le scénario de démo (≈ 3 min)
+## 4. Le scénario de démo (le pitch, 4 min)
 
-**Avant (5 min) :**
-1. `.env` : `PREFLIGHT_DRY_RUN=0`, `TABS_SCOPE=front`, `CALENDAR_ICS_URL` commentée.
-2. `npm run demo:tabs` : une fenêtre Chrome de démo s'ouvre (18 onglets). **Laisse-la au premier plan.**
-3. Ouvre **Spotify** (une app « inutile » à fermer). Ferme **Docker** si des conteneurs comptent.
-4. `npm run dev`. Ouvre la page **Mon PC** une fois : le tri des onglets est fait et gardé 5 min, le pre-flight s'ouvrira instantanément.
+**Avant (10 min) :**
+1. `.env` : `PREFLIGHT_DRY_RUN=0`, `TABS_SCOPE=front`, `CALENDAR_ICS_FILE=` chemin complet de `resources/outlook-preflight-22-23nov.ics` (l'événement « Pitch LauzHack » à l'heure de ton passage).
+2. `npm run demo:tabs` : la fenêtre Chrome de démo. **Laisse-la au premier plan.**
+3. Ouvre **Spotify** (une app « inutile » à fermer).
+4. `npm run dev` : **seule la mascotte apparaît**, en bas à droite. Ouvre Mon PC une fois (le tri des onglets est préparé), puis ferme le tableau de bord.
+5. Raccourcis : active ⌃⌥P (présentation) dans la page Raccourcis.
+6. Câble HDMI à portée de main, **débranché**. Recopie vidéo réglée.
 
 **Pendant :**
-1. Sidebar → **08:30 brief** → taper la phrase de démo (section 2) → « Ta journée est prête ».
-2. Sidebar → **09:55 pre-flight** → le pop-up s'ouvre **tout seul**. Montrer les niveaux de risque, « Voir onglet par onglet », décocher un onglet.
-3. « Voir pourquoi » → l'arbre : ta journée → tes apps → tes onglets, en rouge ce que l'IA ferme.
-4. « Préparer » → Spotify et les onglets se ferment.
-5. **Journal** → « Annuler » sur une action → elle revient.
-6. Sidebar → **10:45 café** → « je peux libérer X Go pendant ta pause » : caches reconstructibles cochés, Corbeille et vieux téléchargements à cocher (« demande »), mise à jour placée avant le meeting de 11:30.
-7. Sidebar → **18:00 bilan** → les chiffres du jour, **« Dans ton sac pour demain : adaptateur HDMI »**, cocher ce qui est fait, « Garder pour demain ».
-8. **Semaine** → « seulement le réel » → ce que l'agent a fait gagner, avec les hypothèses.
-9. (Option) **08:30 brief** à nouveau → ce qui restait est déjà pré-rempli.
+1. *(0:00)* Écran vide, juste la mascotte. Le problème en une phrase.
+2. *(0:20)* Clic sur la mascotte (« Hey bro, let's begin ») → brief : tu écris ta journée → « N tâches placées ».
+3. *(0:55)* Horloge → 5 min avant le pitch → la mascotte : « « Pitch LauzHack » à 12:30. Je prépare ton Mac. » → pre-flight : ⚠ aucun écran branché → tu branches → ✓ en 3 s. Spotify et les onglets inutiles fermés.
+4. *(1:50)* Bloc « préparer la présentation de mon projet de master » : le pre-flight propose « Créer la présentation au modèle de l'entreprise », ou tu appuies sur **⌃⌥P** → Keynote s'ouvre au modèle Lémanic. Page Raccourcis : 46 min/semaine à la main → 1 min.
+5. *(2:40)* 18:00 → bilan : temps gagné, ce qui reste, « Dans ton sac pour demain ».
+6. *(3:20)* Sécurité (rien sans ton accord, Annuler, simulation par défaut) et la suite (flotte d'entreprise, données Nexthink).
 
 **Après :** remets `PREFLIGHT_DRY_RUN=1`.
 
@@ -120,10 +119,22 @@ L'app lit l'invitation (titre, description, lieu). Sans indice, elle ne sait pas
 | 20 | Pop-up du test 19 ouvert, branche un écran / une TV / un projecteur | En 3 s, l'alerte devient « ✓ Écran externe branché (nom) » et le titre « Tout est prêt » (ou une chose de moins à régler) | à vérifier |
 | 21 | Brief « présenter le pitch à 12h30 », puis 12:25 | Même alerte écran + HDMI dans « À avoir sur toi aujourd'hui » | à vérifier |
 | 22 | 18:00 bilan → « Garder pour demain » → bouton **demain 08:30** | Horloge « lun. 23 nov. · J+1 », meetings du lundi (avec le fichier Outlook), tâches d'hier disparues, brief pré-rempli avec ce qui restait | à vérifier |
+| 23 | `npm run dev` | Seule la mascotte apparaît en bas à droite, bulle « Clique-moi pour commencer ta journée » ; pas de tableau de bord | à vérifier |
+| 24 | Clic sur la mascotte | Le brief s'ouvre, la mascotte dit « Bonjour ! » ; après le brief, « N tâches placées » ; un 2e clic ouvre le tableau de bord ; clic droit = menu | à vérifier |
+| 25 | Horloge → pre-flight | La mascotte saute et annonce le bloc | à vérifier |
+| 26 | Pre-flight d'un meeting → « Ouvrir des notes de réunion déjà remplies » | Pages s'ouvre avec titre, date, participants, ordre du jour, Décisions, Actions (fichier dans Documents/Preflight) | à vérifier |
+| 27 | Page Raccourcis → « Essayer » sur la présentation | Keynote s'ouvre avec le modèle Lémanic (fond bleu, logo) ; ligne « fait » dans le journal | à vérifier |
+| 28 | « Créer le raccourci ⌃⌥P », puis ⌃⌥P depuis n'importe quelle app | Nouvelle présentation ouverte, la mascotte le dit | à vérifier |
+| 29 | Tri des onglets sur `npm run demo:tabs` | GitHub, Moodle, Stack Overflow, tuto Electron… gardés (« site de travail ») ; Netflix, Reddit, Instagram… fermés | à vérifier |
 | 16 | Brief avec « le fichier budget_q4 » et « sur GitHub », puis « aller à » 13:55 | Pre-flight : « Ouvrir budget_q4.xlsx », onglet GitHub mis devant ou ouvert | à vérifier |
 | 17 | 18:00 bilan → « Garder pour demain » → **demain 08:30** | Le brief du lendemain est pré-rempli avec ce qui restait (pas le soir même, pas à chaque relance) ; effacé dès qu'un brief est planifié | ✅ |
 
 ## 6. Si quelque chose ne marche pas
+
+- **La mascotte n'apparaît pas** : icône de la barre de menu → « Afficher la mascotte ». Ou `PREFLIGHT_START=dashboard` dans `.env` pour revenir à l'ancien démarrage.
+- **⌃⌥P ne fait rien** : la page Raccourcis dit si la touche est déjà prise par une autre app ; utilise « Essayer ».
+- **Keynote / Pages affiche « document importé »** : normal, les modèles sont au format Office (.pptx, .docx) ; Keynote et Pages les convertissent.
+
 
 | Symptôme | Cause probable | Que faire |
 |---|---|---|

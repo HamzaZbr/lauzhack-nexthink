@@ -16,6 +16,8 @@ interface Prefs {
   carryOver?: string;
   /** Jour (horloge de l'app) où « ce qui reste » a été noté : on ne le propose qu'à partir du lendemain. */
   carryOverDay?: string;
+  /** Raccourcis que tu as activés (ids de shared/shortcuts.ts). */
+  shortcuts?: string[];
 }
 
 const path = () => join(app.getPath("userData"), "prefs.json");
@@ -37,6 +39,12 @@ function save() {
   } catch {
     /* tant pis, on garde en mémoire */
   }
+}
+
+export const getEnabledShortcuts = () => load().shortcuts ?? [];
+export function setEnabledShortcuts(ids: string[]) {
+  load().shortcuts = [...new Set(ids)].slice(0, 10);
+  save();
 }
 
 /**

@@ -127,6 +127,12 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire
 - [x] **Last feature : les besoins de chaque bloc** (remplace les processus en arrière-plan, abandonnés) : internet, écran externe, batterie, matériel. Déduits de l'invitation (règles) et du brief (LLM + règles). La veille au soir et le matin : « Dans ton sac : adaptateur HDMI, chargeur ». À T-5 : Wi-Fi faible, batterie < 50 % sur un bloc long, aucun écran externe alors que tu présentes → alerte. Lecture seule, aucune action sur le Mac
 - [x] Changement de jour : bouton « demain 08:30 », meetings du lendemain rechargés, tâches de la veille oubliées (aussi à minuit en vrai)
 - [ ] Tester les besoins et le changement de jour sur le Mac (GUIDE.md, tests 18 à 22)
+- [x] **Nuit du 22 : tri des onglets fiabilisé** — `gpt-oss-120b` par défaut ; sites de travail (GitHub, Stack Overflow, docs, *.epfl.ch, arXiv…) et vidéos de tuto toujours gardés par le code
+- [x] **Apps Apple quand Office manque** — « Excel » → Numbers, « Word » → Pages, « PowerPoint » → Keynote ; Teams absent → retiré (le lien s'ouvre dans le navigateur)
+- [x] **Raccourcis appris + modèles de l'entreprise** — journal d'usage simulé (démo), 4 routines repérées (46 min/semaine → 1 min) ; ⌃⌥P présentation, ⌃⌥R rapport, ⌃⌥T tableau, ⌃⌥N notes ; page Raccourcis [3] ; entreprise inventée « Lémanic SA »
+- [x] **Notes de réunion pré-remplies** dans le pre-flight de chaque meeting (titre, date, lieu, participants, ordre du jour)
+- [x] **Mascotte « Pilou »** — seule fenêtre au lancement ; clic = brief puis tableau de bord ; elle annonce chaque pop-up et chaque raccourci
+- [ ] Tester tout ça sur le Mac (GUIDE.md, tests 23 à 29)
 - [ ] 3-4 slides : qui, quelle douleur, démo, sécurité, prochaines étapes
 - [ ] Vidéo de secours de la démo
 - [ ] Répéter 3 min · push final avant 12:00

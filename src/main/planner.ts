@@ -114,7 +114,41 @@ export async function planPreflight(): Promise<PreflightPlan> {
     .forEach((w) => add({ tool: "open_app", target: w === "Teams" ? "Microsoft Teams" : w }, `Nécessaire pour « ${block.title} ».`));
 
   // 5 bis. Espace de travail : documents cités (trouvés sur le Mac) et sites utiles (onglet mis devant ou ouvert)
-  if (next) for (const w of await planWorkspace(next, snapshot.chromeTabs)) add(w.req, w.reason);
+  const workspace = next ? await planWorkspace(next, snapshot.chromeTabs) : [];
+  for (const w of workspace) add(w.req, w.reason);
+
+  // 5 ter. Documents de l'entreprise : notes de réunion pré-remplies, ou modèle pour une tâche de présentation / rapport
+  if (next?.kind === "meeting")
+    add(
+      {
+        tool: "meeting_notes",
+        target: `Notes – ${next.title}`,
+        args: {
+          title: next.title,
+          date: now().toLocaleDateString("fr-CH", { weekday: "long", day: "numeric", month: "long", year: "numeric" }),
+          start: next.start,
+          end: next.end,
+          location: next.location,
+          attendees: next.attendees ?? [],
+          agenda: next.notes,
+        },
+      },
+      `Titre, heure${next.attendees?.length ? `, ${next.attendees.length} participants` : ""} et ordre du jour déjà remplis depuis l'invitation : plus de copier-coller.`,
+    );
+  if (next?.kind === "focus" && !workspace.some((w) => w.req.tool === "open_file")) {
+    const kind = /pr[ée]sentation|slides|keynote|powerpoint|deck|pitch/i.test(next.title)
+      ? "presentation"
+      : /rapport|report|compte[- ]rendu|m[ée]mo/i.test(next.title)
+        ? "rapport"
+        : /tableau|budget|suivi|numbers|excel/i.test(next.title)
+          ? "tableau"
+          : null;
+    if (kind)
+      add(
+        { tool: "new_from_template", target: kind },
+        `« ${next.title} » : je pars du modèle de l'entreprise (fond, logo, mise en page) au lieu d'un document vierge.`,
+      );
+  }
 
   // 6. Mise à jour système (démo) : jamais pendant un meeting, proposée pour le prochain créneau libre
   const free = getMaintenanceSlot();

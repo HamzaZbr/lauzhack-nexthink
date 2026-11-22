@@ -1,0 +1,480 @@
+{
+ "_note": "Journal d'usage SIMULÉ pour la démo (semaine du 16 au 20 novembre 2026). En entreprise, ces données viendraient d'un outil de télémétrie du poste.",
+ "sessions": [
+  {
+   "at": "2026-11-16T08:25:00",
+   "app": "Keynote",
+   "steps": [
+    "Nouvelle présentation (Keynote)",
+    "Choisir le thème Blanc",
+    "Format › Arrière-plan › Image",
+    "Importer fond_lemanic.png",
+    "Insérer logo_lemanic.png",
+    "Police du titre : Helvetica Neue 44",
+    "Enregistrer dans Documents/Lémanic"
+   ],
+   "seconds": 50
+  },
+  {
+   "at": "2026-11-16T08:45:00",
+   "app": "Pages",
+   "steps": [
+    "Notes de réunion (Pages)",
+    "Ouvrir l'invitation dans Outlook",
+    "Copier titre, date, heure",
+    "Copier les participants",
+    "Copier l'ordre du jour",
+    "Ajouter Décisions / Actions"
+   ],
+   "seconds": 145
+  },
+  {
+   "at": "2026-11-16T12:36:00",
+   "app": "Pages",
+   "steps": [
+    "Nouveau rapport (Pages)",
+    "Document vierge",
+    "Marges 2,4 cm",
+    "En-tête : logo + LÉMANIC SA",
+    "Styles Titre / Titre 1 en bleu",
+    "Pied de page « Document interne »",
+    "Rubriques Résumé, Contexte, Analyse",
+    "Enregistrer dans Documents/Lémanic"
+   ],
+   "seconds": 80
+  },
+  {
+   "at": "2026-11-16T12:51:00",
+   "app": "Keynote",
+   "steps": [
+    "Nouvelle présentation (Keynote)",
+    "Choisir le thème Blanc",
+    "Format › Arrière-plan › Image",
+    "Importer fond_lemanic.png",
+    "Insérer logo_lemanic.png",
+    "Police du titre : Helvetica Neue 44",
+    "Enregistrer dans Documents/Lémanic"
+   ],
+   "seconds": 41
+  },
+  {
+   "at": "2026-11-16T13:59:00",
+   "app": "Pages",
+   "steps": [
+    "Notes de réunion (Pages)",
+    "Ouvrir l'invitation dans Outlook",
+    "Copier titre, date, heure",
+    "Copier les participants",
+    "Copier l'ordre du jour",
+    "Ajouter Décisions / Actions"
+   ],
+   "seconds": 143
+  },
+  {
+   "at": "2026-11-16T16:53:00",
+   "app": "Keynote",
+   "steps": [
+    "Nouvelle présentation (Keynote)",
+    "Choisir le thème Blanc",
+    "Format › Arrière-plan › Image",
+    "Importer fond_lemanic.png",
+    "Insérer logo_lemanic.png",
+    "Police du titre : Helvetica Neue 44",
+    "Enregistrer dans Documents/Lémanic"
+   ],
+   "seconds": 42
+  },
+  {
+   "at": "2026-11-17T09:16:00",
+   "app": "Keynote",
+   "steps": [
+    "Nouvelle présentation (Keynote)",
+    "Choisir le thème Blanc",
+    "Format › Arrière-plan › Image",
+    "Importer fond_lemanic.png",
+    "Insérer logo_lemanic.png",
+    "Police du titre : Helvetica Neue 44",
+    "Enregistrer dans Documents/Lémanic"
+   ],
+   "seconds": 39
+  },
+  {
+   "at": "2026-11-17T09:26:00",
+   "app": "Pages",
+   "steps": [
+    "Notes de réunion (Pages)",
+    "Ouvrir l'invitation dans Outlook",
+    "Copier titre, date, heure",
+    "Copier les participants",
+    "Copier l'ordre du jour",
+    "Ajouter Décisions / Actions"
+   ],
+   "seconds": 144
+  },
+  {
+   "at": "2026-11-17T10:19:00",
+   "app": "Keynote",
+   "steps": [
+    "Nouvelle présentation (Keynote)",
+    "Choisir le thème Blanc",
+    "Format › Arrière-plan › Image",
+    "Importer fond_lemanic.png",
+    "Insérer logo_lemanic.png",
+    "Police du titre : Helvetica Neue 44",
+    "Enregistrer dans Documents/Lémanic"
+   ],
+   "seconds": 42
+  },
+  {
+   "at": "2026-11-17T11:30:00",
+   "app": "Keynote",
+   "steps": [
+    "Nouvelle présentation (Keynote)",
+    "Choisir le thème Blanc",
+    "Format › Arrière-plan › Image",
+    "Importer fond_lemanic.png",
+    "Insérer logo_lemanic.png",
+    "Police du titre : Helvetica Neue 44",
+    "Enregistrer dans Documents/Lémanic"
+   ],
+   "seconds": 41
+  },
+  {
+   "at": "2026-11-17T12:06:00",
+   "app": "Keynote",
+   "steps": [
+    "Nouvelle présentation (Keynote)",
+    "Choisir le thème Blanc",
+    "Format › Arrière-plan › Image",
+    "Importer fond_lemanic.png",
+    "Insérer logo_lemanic.png",
+    "Police du titre : Helvetica Neue 44",
+    "Enregistrer dans Documents/Lémanic"
+   ],
+   "seconds": 56
+  },
+  {
+   "at": "2026-11-18T08:00:00",
+   "app": "Finder",
+   "steps": [
+    "Exporter en PDF"
+   ],
+   "seconds": 15
+  },
+  {
+   "at": "2026-11-18T08:00:00",
+   "app": "Finder",
+   "steps": [
+    "Renommer un fichier"
+   ],
+   "seconds": 15
+  },
+  {
+   "at": "2026-11-18T08:00:00",
+   "app": "Finder",
+   "steps": [
+    "Partager par mail"
+   ],
+   "seconds": 15
+  },
+  {
+   "at": "2026-11-18T08:05:00",
+   "app": "Pages",
+   "steps": [
+    "Nouveau rapport (Pages)",
+    "Document vierge",
+    "Marges 2,4 cm",
+    "En-tête : logo + LÉMANIC SA",
+    "Styles Titre / Titre 1 en bleu",
+    "Pied de page « Document interne »",
+    "Rubriques Résumé, Contexte, Analyse",
+    "Enregistrer dans Documents/Lémanic"
+   ],
+   "seconds": 59
+  },
+  {
+   "at": "2026-11-18T08:14:00",
+   "app": "Keynote",
+   "steps": [
+    "Nouvelle présentation (Keynote)",
+    "Choisir le thème Blanc",
+    "Format › Arrière-plan › Image",
+    "Importer fond_lemanic.png",
+    "Insérer logo_lemanic.png",
+    "Police du titre : Helvetica Neue 44",
+    "Enregistrer dans Documents/Lémanic"
+   ],
+   "seconds": 49
+  },
+  {
+   "at": "2026-11-18T08:20:00",
+   "app": "Pages",
+   "steps": [
+    "Notes de réunion (Pages)",
+    "Ouvrir l'invitation dans Outlook",
+    "Copier titre, date, heure",
+    "Copier les participants",
+    "Copier l'ordre du jour",
+    "Ajouter Décisions / Actions"
+   ],
+   "seconds": 147
+  },
+  {
+   "at": "2026-11-18T09:54:00",
+   "app": "Keynote",
+   "steps": [
+    "Nouvelle présentation (Keynote)",
+    "Choisir le thème Blanc",
+    "Format › Arrière-plan › Image",
+    "Importer fond_lemanic.png",
+    "Insérer logo_lemanic.png",
+    "Police du titre : Helvetica Neue 44",
+    "Enregistrer dans Documents/Lémanic"
+   ],
+   "seconds": 52
+  },
+  {
+   "at": "2026-11-18T09:57:00",
+   "app": "Pages",
+   "steps": [
+    "Notes de réunion (Pages)",
+    "Ouvrir l'invitation dans Outlook",
+    "Copier titre, date, heure",
+    "Copier les participants",
+    "Copier l'ordre du jour",
+    "Ajouter Décisions / Actions"
+   ],
+   "seconds": 147
+  },
+  {
+   "at": "2026-11-18T10:16:00",
+   "app": "Numbers",
+   "steps": [
+    "Nouveau tableau de suivi (Numbers)",
+    "Copier l'en-tête du dernier fichier",
+    "Couleurs de l'entreprise",
+    "Colonnes Responsable / Échéance / Statut",
+    "Formule de total"
+   ],
+   "seconds": 60
+  },
+  {
+   "at": "2026-11-18T10:49:00",
+   "app": "Numbers",
+   "steps": [
+    "Nouveau tableau de suivi (Numbers)",
+    "Copier l'en-tête du dernier fichier",
+    "Couleurs de l'entreprise",
+    "Colonnes Responsable / Échéance / Statut",
+    "Formule de total"
+   ],
+   "seconds": 68
+  },
+  {
+   "at": "2026-11-18T14:32:00",
+   "app": "Keynote",
+   "steps": [
+    "Nouvelle présentation (Keynote)",
+    "Choisir le thème Blanc",
+    "Format › Arrière-plan › Image",
+    "Importer fond_lemanic.png",
+    "Insérer logo_lemanic.png",
+    "Police du titre : Helvetica Neue 44",
+    "Enregistrer dans Documents/Lémanic"
+   ],
+   "seconds": 40
+  },
+  {
+   "at": "2026-11-18T15:01:00",
+   "app": "Pages",
+   "steps": [
+    "Notes de réunion (Pages)",
+    "Ouvrir l'invitation dans Outlook",
+    "Copier titre, date, heure",
+    "Copier les participants",
+    "Copier l'ordre du jour",
+    "Ajouter Décisions / Actions"
+   ],
+   "seconds": 139
+  },
+  {
+   "at": "2026-11-18T16:12:00",
+   "app": "Pages",
+   "steps": [
+    "Nouveau rapport (Pages)",
+    "Document vierge",
+    "Marges 2,4 cm",
+    "En-tête : logo + LÉMANIC SA",
+    "Styles Titre / Titre 1 en bleu",
+    "Pied de page « Document interne »",
+    "Rubriques Résumé, Contexte, Analyse",
+    "Enregistrer dans Documents/Lémanic"
+   ],
+   "seconds": 71
+  },
+  {
+   "at": "2026-11-18T17:12:00",
+   "app": "Numbers",
+   "steps": [
+    "Nouveau tableau de suivi (Numbers)",
+    "Copier l'en-tête du dernier fichier",
+    "Couleurs de l'entreprise",
+    "Colonnes Responsable / Échéance / Statut",
+    "Formule de total"
+   ],
+   "seconds": 62
+  },
+  {
+   "at": "2026-11-18T17:39:00",
+   "app": "Pages",
+   "steps": [
+    "Notes de réunion (Pages)",
+    "Ouvrir l'invitation dans Outlook",
+    "Copier titre, date, heure",
+    "Copier les participants",
+    "Copier l'ordre du jour",
+    "Ajouter Décisions / Actions"
+   ],
+   "seconds": 145
+  },
+  {
+   "at": "2026-11-19T10:14:00",
+   "app": "Pages",
+   "steps": [
+    "Nouveau rapport (Pages)",
+    "Document vierge",
+    "Marges 2,4 cm",
+    "En-tête : logo + LÉMANIC SA",
+    "Styles Titre / Titre 1 en bleu",
+    "Pied de page « Document interne »",
+    "Rubriques Résumé, Contexte, Analyse",
+    "Enregistrer dans Documents/Lémanic"
+   ],
+   "seconds": 67
+  },
+  {
+   "at": "2026-11-19T12:11:00",
+   "app": "Pages",
+   "steps": [
+    "Notes de réunion (Pages)",
+    "Ouvrir l'invitation dans Outlook",
+    "Copier titre, date, heure",
+    "Copier les participants",
+    "Copier l'ordre du jour",
+    "Ajouter Décisions / Actions"
+   ],
+   "seconds": 149
+  },
+  {
+   "at": "2026-11-19T12:33:00",
+   "app": "Pages",
+   "steps": [
+    "Nouveau rapport (Pages)",
+    "Document vierge",
+    "Marges 2,4 cm",
+    "En-tête : logo + LÉMANIC SA",
+    "Styles Titre / Titre 1 en bleu",
+    "Pied de page « Document interne »",
+    "Rubriques Résumé, Contexte, Analyse",
+    "Enregistrer dans Documents/Lémanic"
+   ],
+   "seconds": 75
+  },
+  {
+   "at": "2026-11-19T13:09:00",
+   "app": "Pages",
+   "steps": [
+    "Nouveau rapport (Pages)",
+    "Document vierge",
+    "Marges 2,4 cm",
+    "En-tête : logo + LÉMANIC SA",
+    "Styles Titre / Titre 1 en bleu",
+    "Pied de page « Document interne »",
+    "Rubriques Résumé, Contexte, Analyse",
+    "Enregistrer dans Documents/Lémanic"
+   ],
+   "seconds": 79
+  },
+  {
+   "at": "2026-11-19T15:09:00",
+   "app": "Keynote",
+   "steps": [
+    "Nouvelle présentation (Keynote)",
+    "Choisir le thème Blanc",
+    "Format › Arrière-plan › Image",
+    "Importer fond_lemanic.png",
+    "Insérer logo_lemanic.png",
+    "Police du titre : Helvetica Neue 44",
+    "Enregistrer dans Documents/Lémanic"
+   ],
+   "seconds": 35
+  },
+  {
+   "at": "2026-11-19T17:18:00",
+   "app": "Pages",
+   "steps": [
+    "Nouveau rapport (Pages)",
+    "Document vierge",
+    "Marges 2,4 cm",
+    "En-tête : logo + LÉMANIC SA",
+    "Styles Titre / Titre 1 en bleu",
+    "Pied de page « Document interne »",
+    "Rubriques Résumé, Contexte, Analyse",
+    "Enregistrer dans Documents/Lémanic"
+   ],
+   "seconds": 71
+  },
+  {
+   "at": "2026-11-19T17:20:00",
+   "app": "Pages",
+   "steps": [
+    "Notes de réunion (Pages)",
+    "Ouvrir l'invitation dans Outlook",
+    "Copier titre, date, heure",
+    "Copier les participants",
+    "Copier l'ordre du jour",
+    "Ajouter Décisions / Actions"
+   ],
+   "seconds": 158
+  },
+  {
+   "at": "2026-11-19T17:43:00",
+   "app": "Numbers",
+   "steps": [
+    "Nouveau tableau de suivi (Numbers)",
+    "Copier l'en-tête du dernier fichier",
+    "Couleurs de l'entreprise",
+    "Colonnes Responsable / Échéance / Statut",
+    "Formule de total"
+   ],
+   "seconds": 50
+  },
+  {
+   "at": "2026-11-20T11:57:00",
+   "app": "Pages",
+   "steps": [
+    "Notes de réunion (Pages)",
+    "Ouvrir l'invitation dans Outlook",
+    "Copier titre, date, heure",
+    "Copier les participants",
+    "Copier l'ordre du jour",
+    "Ajouter Décisions / Actions"
+   ],
+   "seconds": 148
+  },
+  {
+   "at": "2026-11-20T13:17:00",
+   "app": "Keynote",
+   "steps": [
+    "Nouvelle présentation (Keynote)",
+    "Choisir le thème Blanc",
+    "Format › Arrière-plan › Image",
+    "Importer fond_lemanic.png",
+    "Insérer logo_lemanic.png",
+    "Police du titre : Helvetica Neue 44",
+    "Enregistrer dans Documents/Lémanic"
+   ],
+   "seconds": 57
+  }
+ ]
+}

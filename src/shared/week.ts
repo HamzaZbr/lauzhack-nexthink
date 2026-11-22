@@ -7,6 +7,8 @@ import type { ActionLogEntry } from "./types";
 export const HYPOTHESES = [
   { tool: "check_device", minutes: 5, label: "Problème détecté avant un meeting (batterie, Wi-Fi, disque…)", per: "problème" },
   { tool: "check_needs", minutes: 5, label: "Besoin réglé avant le bloc (chargeur, écran externe, réseau)", per: "alerte" },
+  { tool: "new_from_template", minutes: 0.7, label: "Document créé au modèle de l'entreprise (45 s de mise en page à la main → 2 s)", per: "document" },
+  { tool: "meeting_notes", minutes: 2.4, label: "Notes de réunion pré-remplies (2 min 30 de copier-coller depuis l'invitation)", per: "réunion" },
   { tool: "open_url", minutes: 1, label: "Lien du meeting ouvert pour toi (plus besoin de le chercher dans le mail)", per: "meeting" },
   { tool: "open_app", minutes: 0.5, label: "App nécessaire ouverte avant le bloc", per: "app" },
   { tool: "quit_app", minutes: 0.5, label: "App inutile fermée (moins de ralentissements)", per: "app" },

@@ -23,6 +23,9 @@ export interface DayBlock {
   docs?: string[];
   /** Ce dont le bloc a besoin : internet, écran externe, batterie, matériel à emporter. */
   needs?: BlockNeeds;
+  /** Lieu et participants de l'invitation (pour les notes de réunion). */
+  location?: string;
+  attendees?: string[];
 }
 
 export interface BlockNeeds {
@@ -219,6 +222,13 @@ export interface PreflightApi {
   popupAnswer(kind: PopupKind, data: unknown): Promise<void>;
   showDashboard(view?: string): Promise<void>;
   snapshot(fresh?: boolean): Promise<DeviceSnapshot>;
+  /** Mascotte : clic (brief ou tableau de bord) et menu (clic droit). */
+  mascotClick(): Promise<void>;
+  mascotMenu(): Promise<void>;
+  /** Raccourcis : définitions, activés, routines repérées dans le journal d'usage (démo). */
+  shortcuts(): Promise<ShortcutsState>;
+  toggleShortcut(id: string, on: boolean): Promise<{ enabled: string[]; conflict?: string }>;
+  runShortcut(id: string): Promise<ActionLogEntry | null>;
   /** Écrans branchés, lus en direct (le pop-up pre-flight surveille le branchement). */
   displays(): Promise<DisplayInfo | null>;
   catalog(): Promise<ToolInfo[]>;
@@ -240,4 +250,12 @@ export interface PreflightApi {
   carryOver(): Promise<string>;
   setCarryOver(text: string): Promise<void>;
   onEvent(cb: (event: { type: string; payload?: unknown }) => void): () => void;
+}
+
+export interface ShortcutsState {
+  defs: import("./shortcuts").ShortcutDef[];
+  enabled: string[];
+  routines: import("./shortcuts").Routine[];
+  sessions: number;
+  note: string;
 }

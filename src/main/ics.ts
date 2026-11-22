@@ -8,6 +8,22 @@ const hhmm = (d: Date) => `${String(d.getHours()).padStart(2, "0")}:${String(d.g
 
 const LINK = /(https:\/\/teams\.microsoft\.com\/l\/meetup-join\/[^\s<>"']+|https:\/\/[\w.-]*zoom\.us\/j\/[^\s<>"']+|https:\/\/[\w.-]*webex\.com\/[^\s<>"']+|https:\/\/meet\.google\.com\/[\w-]+)/i;
 
+/** Participants d'une invitation : le nom (CN) s'il existe, sinon l'adresse sans « mailto: ». */
+export function attendeesOf(raw: unknown): string[] {
+  const list = Array.isArray(raw) ? raw : raw ? [raw] : [];
+  return [
+    ...new Set(
+      list
+        .map((a) => {
+          const o = a as { params?: { CN?: string }; val?: string };
+          const name = o?.params?.CN ?? (typeof a === "string" ? a : o?.val) ?? "";
+          return String(name).replace(/^mailto:/i, "").replace(/^"|"$/g, "").trim();
+        })
+        .filter((x) => x.length > 1),
+    ),
+  ].slice(0, 20);
+}
+
 /** Devine les apps d'un meeting à partir de son lien et de sa description. */
 export function appsFor(blob: string, link?: string): string[] {
   const apps = new Set<string>();
@@ -51,6 +67,8 @@ export function icsToBlocks(ics: string, day: Date, mapToToday = false): DayBloc
         apps: appsFor(blob, link),
         link,
         docs: [...new Set((blob.match(/[\w.-]+\.(xlsx|xls|csv|docx|doc|pptx|ppt|key|pages|numbers|pdf)\b/gi) ?? []).map((f) => f.replace(/\.[a-z]+$/i, "")))].slice(0, 3),
+        location: text(inst.ev.location).trim().slice(0, 120) || undefined,
+        attendees: attendeesOf((inst.ev as unknown as { attendee?: unknown }).attendee),
         needs: needsFromText(blob, { link, minutes: Math.round((inst.end.getTime() - inst.start.getTime()) / 60_000) }),
         notes: text(inst.ev.description).replace(/https?:\/\/\S+/g, "").replace(/\s+/g, " ").trim().slice(0, 300) || undefined,
       });

@@ -5,6 +5,12 @@ import type { PopupKind } from "../shared/types";
 
 let dashboard: BrowserWindow | null = null;
 let popup: BrowserWindow | null = null;
+let mascot: BrowserWindow | null = null;
+/** Appelé à chaque ouverture de pop-up (la mascotte l'annonce). */
+let onPopup: (kind: PopupKind) => void = () => {};
+export const setPopupListener = (fn: (kind: PopupKind) => void) => {
+  onPopup = fn;
+};
 
 const webPreferences = {
   preload: join(__dirname, "../preload/index.js"),
@@ -74,6 +80,49 @@ export function openPopup(kind: PopupKind) {
   popup.once("ready-to-show", () => popup?.showInactive());
   popup.on("closed", () => (popup = null));
   load(popup, `/popup/${kind}`);
+  onPopup(kind);
+}
+
+export const MASCOT_SIZE = { width: 260, height: 210 };
+
+/**
+ * La mascotte : un petit personnage dans le coin bas droit, toujours devant, fond transparent.
+ * Au démarrage, c'est la seule fenêtre visible : clic → brief du matin, puis le tableau de bord.
+ */
+export function showMascot() {
+  if (mascot && !mascot.isDestroyed()) {
+    mascot.showInactive();
+    return mascot;
+  }
+  const area = screen.getPrimaryDisplay().workArea;
+  mascot = new BrowserWindow({
+    ...MASCOT_SIZE,
+    x: area.x + area.width - MASCOT_SIZE.width - 12,
+    y: area.y + area.height - MASCOT_SIZE.height - 8,
+    frame: false,
+    transparent: true,
+    hasShadow: false,
+    resizable: false,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    focusable: true,
+    show: false,
+    backgroundColor: "#00000000",
+    webPreferences,
+  });
+  mascot.setAlwaysOnTop(true, "floating");
+  mascot.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  mascot.once("ready-to-show", () => mascot?.showInactive());
+  mascot.on("closed", () => (mascot = null));
+  load(mascot, "/mascot");
+  return mascot;
+}
+
+export const hideMascot = () => mascot?.hide();
+
+/** Fait parler la mascotte : humeur + bulle de texte. */
+export function toMascot(mood: "idle" | "alert" | "happy" | "talk", text?: string) {
+  if (mascot && !mascot.isDestroyed()) mascot.webContents.send("event", { type: "mascot", payload: { mood, text } });
 }
 
 export function closePopup() {

@@ -15,6 +15,9 @@ function actionTitle(a: { tool: string; target: string }, meetingLink?: string) 
   if (a.tool === "open_app") return `Ouvrir ${a.target}`;
   if (a.tool === "open_file") return `Ouvrir ${a.target.split("/").pop()}`;
   if (a.tool === "focus_tab") return `Mettre devant ton onglet ${a.target}`;
+  if (a.tool === "meeting_notes") return "Ouvrir des notes de réunion déjà remplies";
+  if (a.tool === "new_from_template")
+    return a.target === "presentation" ? "Créer la présentation au modèle de l'entreprise" : a.target === "rapport" ? "Créer le rapport au modèle de l'entreprise" : "Créer le tableau au modèle de l'entreprise";
   return a.target;
 }
 

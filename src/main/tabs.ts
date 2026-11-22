@@ -4,7 +4,8 @@
  * Ce fichier décide ce qui est AUTORISÉ :
  * - index invalide → ignoré ; onglet non cité → gardé ;
  * - jamais fermés : l'onglet affiché en ce moment, le lien du meeting, la messagerie,
- *   les documents Office/Google si le meeting en a besoin ;
+ *   les documents Office/Google si le meeting en a besoin, les sites de travail connus (GitHub, Stack Overflow,
+ *   docs, Moodle…) et les vidéos de tuto ;
  * - si une copie d'une URL est gardée, aucune copie n'est fermée ;
  * - au plus MAX_CLOSE onglets d'un coup.
  */
@@ -28,6 +29,25 @@ export const hostOf = (url: string) => {
   }
 };
 
+/**
+ * Sites de travail : jamais fermés, même si l'IA le propose. Le code a le dernier mot.
+ * (Ajoute les tiens avec WORK_SITES=exemple.com,autre.org dans .env.)
+ */
+const WORK = /(^|\.)(github\.com|gitlab\.com|bitbucket\.org|stackoverflow\.com|stackexchange\.com|superuser\.com|serverfault\.com|epfl\.ch|arxiv\.org|huggingface\.co|notion\.so|overleaf\.com|kaggle\.com|colab\.research\.google\.com|chatgpt\.com|claude\.ai|figma\.com|python\.org|pytorch\.org|kotlinlang\.org|developer\.mozilla\.org|developer\.apple\.com|readthedocs\.io|npmjs\.com|localhost)$|^(docs|developer|learn)\./i;
+/** Une vidéo YouTube de travail (tuto, cours, conférence) n'est pas une distraction. */
+const WORK_VIDEO = /tuto|tutorial|cours|course|lecture|le[çc]on|conf[ée]rence|talk|how to|explained|introduction to|crash course/i;
+const extraWork = () =>
+  (process.env.WORK_SITES ?? "").split(",").map((x) => x.trim().toLowerCase()).filter(Boolean);
+
+/** L'onglet est-il un site de travail connu ? (raison, ou null) */
+export function workReason(tab: ChromeTab): string | null {
+  const host = hostOf(tab.url);
+  if (host === "fichiers locaux") return "fichier local ouvert";
+  if (WORK.test(host) || extraWork().some((s) => host === s || host.endsWith(`.${s}`))) return "site de travail";
+  if (/youtube\.com$|youtu\.be$/.test(host) && WORK_VIDEO.test(`${tab.title} ${decodeURIComponent(tab.url)}`)) return "vidéo de travail (tuto, cours)";
+  return null;
+}
+
 const MAIL = /outlook\.(office|live)|mail\.google|proton\.me|^mail\./i;
 const OFFICE = /sharepoint|office\.com|officeapps|onedrive|live\.com|docs\.google|drive\.google/i;
 
@@ -38,8 +58,8 @@ export function protectedReason(tab: ChromeTab, block: DayBlock | null): string 
   if (block?.sites?.some((s) => host === s || host.endsWith(`.${s}`))) return `site utile pour « ${block.title} »`;
   if (block?.link && host === hostOf(block.link)) return "lien du meeting";
   if (MAIL.test(host)) return "messagerie (brouillon possible)";
-  if (block && OFFICE.test(host) && block.apps.some((a) => /excel|word|powerpoint|teams/i.test(a))) return "document utile au meeting";
-  return null;
+  if (block && OFFICE.test(host) && block.apps.some((a) => /excel|word|powerpoint|teams|numbers|pages|keynote/i.test(a))) return "document utile au meeting";
+  return workReason(tab);
 }
 
 export function applyTriage(tabs: ChromeTab[], closeList: LlmTabClose[], block: DayBlock | null): TabVerdict[] {
