@@ -7,7 +7,8 @@ import { freeSlots, getCalendar, getDay, isHHMM, setMorningBlocks, toHHMM, toMin
 import { takeSnapshot } from "./sensors";
 import { applyTriage, hostOf, type LlmTabClose } from "./tabs";
 import { learnedPreferences } from "./prefs";
-import type { ChromeTab, DayBlock, DayPlanResult, TabVerdict, TriageInfo } from "../shared/types";
+import { durationMin, mergeNeeds, needsFromText } from "../shared/needs";
+import type { BlockNeeds, ChromeTab, DayBlock, DayPlanResult, TabVerdict, TriageInfo } from "../shared/types";
 
 const COMMON_APPS = ["Outlook", "Microsoft Teams", "Excel", "Word", "PowerPoint", "Google Chrome", "Slack", "Notion", "Figma", "Visual Studio Code"];
 
@@ -25,8 +26,11 @@ const DAY_SCHEMA = {
           apps: { type: "array", items: { type: "string" } },
           sites: { type: "array", items: { type: "string" } },
           docs: { type: "array", items: { type: "string" } },
+          internet: { type: "boolean" },
+          display: { type: "boolean" },
+          gear: { type: "array", items: { type: "string" } },
         },
-        required: ["title", "start", "end", "apps", "sites", "docs"],
+        required: ["title", "start", "end", "apps", "sites", "docs", "internet", "display", "gear"],
       },
     },
     summary: { type: "string" },
@@ -35,7 +39,7 @@ const DAY_SCHEMA = {
 };
 
 interface LlmDay {
-  blocks: Array<{ title: string; start: string; end: string; apps: string[]; sites?: string[]; docs?: string[] }>;
+  blocks: Array<{ title: string; start: string; end: string; apps: string[]; sites?: string[]; docs?: string[]; internet?: boolean; display?: boolean; gear?: string[] }>;
   summary: string;
 }
 
@@ -60,7 +64,7 @@ function sanitize(raw: LlmDay["blocks"], slots: Array<{ start: string; end: stri
     const inSlot = slots.some((sl) => s >= toMin(sl.start) && e <= toMin(sl.end));
     if (!inSlot) continue;
     if (out.some((o) => s < toMin(o.end) && e > toMin(o.start))) continue;
-    out.push({
+    const block: DayBlock = {
       id: `m${i + 1}`,
       start: b.start,
       end: b.end,
@@ -70,7 +74,18 @@ function sanitize(raw: LlmDay["blocks"], slots: Array<{ start: string; end: stri
       apps: (Array.isArray(b.apps) ? b.apps : []).filter((a) => typeof a === "string").map((a) => a.slice(0, 40)).slice(0, 4),
       sites: cleanSites(b.sites),
       docs: (Array.isArray(b.docs) ? b.docs : []).filter((d) => typeof d === "string" && d.trim().length >= 2).map((d) => d.trim().slice(0, 40)).slice(0, 3),
-    });
+    };
+    // Besoins : avis du LLM + règles sur le titre (un besoin vu par l'un des deux compte).
+    const llmNeeds: BlockNeeds = {
+      internet: b.internet === true,
+      display: b.display === true,
+      power: false,
+      gear: (Array.isArray(b.gear) ? b.gear : []).filter((g) => typeof g === "string" && g.trim().length >= 2).map((g) => g.trim().slice(0, 30)).slice(0, 3),
+    };
+    const ruleNeeds = needsFromText(`${block.title} ${(block.sites ?? []).join(" ")}`, { minutes: durationMin(block) });
+    block.needs = mergeNeeds(ruleNeeds, llmNeeds);
+    if (block.needs.display && !block.needs.gear.some((g) => /hdmi|adaptateur/i.test(g))) block.needs.gear.unshift("adaptateur USB-C → HDMI");
+    out.push(block);
   }
   return out;
 }
@@ -87,7 +102,7 @@ function fallback(text: string, slots: Array<{ start: string; end: string }>): D
       if (slots[slot]) cursor = toMin(slots[slot].start);
     }
     if (!slots[slot]) break;
-    blocks.push({ id: `m${i + 1}`, start: toHHMM(cursor), end: toHHMM(cursor + 45), title: p.slice(0, 60), kind: "focus", source: "morning", apps: [] });
+    blocks.push({ id: `m${i + 1}`, start: toHHMM(cursor), end: toHHMM(cursor + 45), title: p.slice(0, 60), kind: "focus", source: "morning", apps: [], needs: needsFromText(p, { minutes: 45 }) });
     cursor += 45;
   }
   return blocks;
@@ -108,6 +123,9 @@ export async function planDay(text: string): Promise<DayPlanResult> {
         "sans chevauchement, et indique pour chaque tâche les apps nécessaires, choisies dans la liste fournie. " +
         "sites : les domaines web utiles à la tâche s'ils sont mentionnés ou évidents (ex. github.com, moodle.epfl.ch, notion.so), sinon []. " +
         "docs : mots-clés courts des fichiers mentionnés, sans extension (ex. « budget_q4 », « pitch »), sinon []. " +
+        "internet : true si la tâche a besoin du réseau (site web, visio, cloud, téléchargement). " +
+        "display : true seulement si l'utilisateur va présenter ou projeter (présentation, pitch, soutenance, démo devant quelqu'un). " +
+        "gear : le matériel physique à avoir sur soi s'il est mentionné ou évident (ex. « adaptateur HDMI », « chargeur », « casque », « clé USB »), sinon []. " +
         "Titres courts (moins de 6 mots), en français. summary : une phrase qui résume la journée.",
       user: JSON.stringify({
         phrase: text,

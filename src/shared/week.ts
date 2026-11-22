@@ -6,6 +6,7 @@ import type { ActionLogEntry } from "./types";
 
 export const HYPOTHESES = [
   { tool: "check_device", minutes: 5, label: "Problème détecté avant un meeting (batterie, Wi-Fi, disque…)", per: "problème" },
+  { tool: "check_needs", minutes: 5, label: "Besoin réglé avant le bloc (chargeur, écran externe, réseau)", per: "alerte" },
   { tool: "open_url", minutes: 1, label: "Lien du meeting ouvert pour toi (plus besoin de le chercher dans le mail)", per: "meeting" },
   { tool: "open_app", minutes: 0.5, label: "App nécessaire ouverte avant le bloc", per: "app" },
   { tool: "quit_app", minutes: 0.5, label: "App inutile fermée (moins de ralentissements)", per: "app" },
@@ -50,7 +51,7 @@ export function weekStats(journal: ActionLogEntry[], now: Date, includeSimulated
   const byTool = HYPOTHESES.map((h) => {
     const rows = counted.filter((e) => e.tool === h.tool);
     // Combien d'« unités » : problèmes détectés, onglets fermés… sinon 1 par action.
-    const units = rows.reduce((s, e) => s + (h.tool === "check_device" || h.tool === "close_tabs" ? (e.items ?? 0) : 1), 0);
+    const units = rows.reduce((s, e) => s + (h.tool === "check_device" || h.tool === "check_needs" || h.tool === "close_tabs" ? (e.items ?? 0) : 1), 0);
     return { tool: h.tool, label: h.label, count: units, minutes: units * h.minutes };
   });
 

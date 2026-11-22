@@ -95,6 +95,16 @@ const tools: ToolDef[] = [
     },
   },
   {
+    tool: "check_needs",
+    label: "Vérifier les besoins du bloc",
+    risk: "auto",
+    description: "Lecture seule : internet, batterie et écran externe comparés à ce dont le bloc a besoin (calculé par le planificateur).",
+    validate: async (req) => {
+      if (typeof req.args?.summary !== "string" || req.args.summary.length > 800) throw new Error("Résumé des besoins invalide.");
+    },
+    execute: async (req) => ({ detail: String(req.args?.summary), items: Math.max(0, Math.min(10, Number(req.args?.alerts) || 0)) }),
+  },
+  {
     tool: "quit_app",
     label: "Fermer une app",
     risk: "confirm",

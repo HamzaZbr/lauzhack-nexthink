@@ -5,7 +5,7 @@
  */
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import type { AppUsage, ChromeTab, DeviceIssue, DeviceSnapshot } from "../shared/types";
+import type { AppUsage, ChromeTab, DeviceIssue, DeviceSnapshot, DisplayInfo } from "../shared/types";
 
 const run = promisify(execFile);
 
@@ -170,6 +170,24 @@ async function readWifi(): Promise<DeviceSnapshot["wifi"]> {
   const value = out ? parseWifi(out) : null;
   wifiCache = { at: Date.now(), value };
   return value;
+}
+
+/** `system_profiler SPDisplaysDataType -json` → écrans externes (tout écran qui n'est pas l'écran intégré). */
+export function parseDisplays(json: string): DisplayInfo | null {
+  try {
+    const gpus = (JSON.parse(json).SPDisplaysDataType ?? []) as Array<{ spdisplays_ndrvs?: Array<Record<string, unknown>> }>;
+    const screens = gpus.flatMap((g) => g.spdisplays_ndrvs ?? []);
+    const external = screens.filter((d) => d.spdisplays_connection_type !== "spdisplays_internal");
+    return { external: external.length, names: external.map((d) => String(d._name ?? "écran externe")).slice(0, 3) };
+  } catch {
+    return null;
+  }
+}
+
+/** Écrans branchés. Lu seulement quand un bloc demande d'en avoir un (system_profiler est lent). */
+export async function readDisplays(): Promise<DisplayInfo | null> {
+  const out = await sh("system_profiler", ["SPDisplaysDataType", "-json"], 8000);
+  return out ? parseDisplays(out) : null;
 }
 
 let last: DeviceSnapshot | null = null;

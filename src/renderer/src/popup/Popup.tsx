@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
-import { Coffee, X } from "lucide-react";
+import { Backpack, Coffee, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { ActionLogEntry, CleanupItem, DayBlock, DayPlanResult, PopupKind, PreflightPlan, Risk } from "@shared/types";
+import type { ActionLogEntry, CleanupItem, DayBlock, DisplayInfo, DayPlanResult, PopupKind, PreflightPlan, Risk } from "@shared/types";
 import { reveal } from "../motion/primitives";
 import { weekStats } from "@shared/week";
+import { bagList, displayLine } from "@shared/needs";
 
 const riskLabel: Record<Risk, string> = { auto: "auto", confirm: "1 clic", ask: "demande" };
 
@@ -81,6 +82,7 @@ function Morning() {
             </motion.div>
           ))}
         </div>
+        <Bag blocks={[...calendar, ...result.blocks]} title="À avoir sur toi aujourd'hui" />
         {result.error ? <p className="microcopy">IA indisponible ({result.error.slice(0, 80)}), plan simple utilisé.</p> : null}
         <p className="microcopy">Je préparerai ton Mac 5 min avant chaque bloc.</p>
         <div className="popup-footer">
@@ -101,6 +103,7 @@ function Morning() {
           <div key={b.id}><time>{b.start}</time><span>{b.title}</span></div>
         ))}
       </div>
+      <Bag blocks={calendar} title="Avant de partir, prends" />
       <div className="dashed" />
       <div>
         <p className="microcopy" style={{ marginBottom: 8 }}>
@@ -126,6 +129,39 @@ function Preflight() {
   const [running, setRunning] = useState(false);
   const [openTabs, setOpenTabs] = useState<string | null>(null); // action dont on affiche les onglets
   const [skipped, setSkipped] = useState<Set<string>>(new Set()); // URLs que l'utilisateur garde finalement
+  const [live, setLive] = useState<DisplayInfo | null>(null); // écrans branchés, relus toutes les 3 s si tu présentes
+
+  const needsDisplay = !!plan?.block.needs?.display && !results;
+  useEffect(() => {
+    if (!needsDisplay) return;
+    let stop = false;
+    const tick = async () => {
+      const d = await window.api.displays();
+      if (!stop && d) setLive(d);
+    };
+    void tick();
+    const id = setInterval(() => void tick(), 3000);
+    return () => {
+      stop = true;
+      clearInterval(id);
+    };
+  }, [needsDisplay]);
+
+  /** Une vérification qui a trouvé quelque chose à régler : affichée en rouge. */
+  const isAlert = (a: { tool: string; target: string; reason: string }) =>
+    (a.tool === "check_needs" && needsView(a).reason.includes("⚠")) || (a.tool === "check_device" && a.reason !== "Rien d'anormal détecté.");
+
+  /** Ligne « besoins » mise à jour en direct : l'écran branché remplace l'alerte. */
+  const needsView = (a: { target: string; reason: string }) => {
+    if (!live || !plan) return { title: a.target, reason: a.reason };
+    const lines = a.reason.split("\n").filter((l) => !/écran externe/i.test(l));
+    const all = [displayLine(plan.block, live), ...lines].sort((x, y) => Number(y.startsWith("⚠")) - Number(x.startsWith("⚠")));
+    const n = all.filter((l) => l.startsWith("⚠")).length;
+    return {
+      title: n ? `${n} chose${n > 1 ? "s" : ""} à régler avant « ${plan.block.title} »` : `Tout est prêt pour « ${plan.block.title} »`,
+      reason: all.join("\n"),
+    };
+  };
 
   useEffect(() => {
     window.api.planPreflight().then((p) => {
@@ -204,8 +240,9 @@ function Preflight() {
                     if (a.tabs) setSkipped(e.target.checked ? new Set() : new Set(a.tabs.filter((t) => t.close).map((t) => t.url)));
                   }} />
                 <div>
-                  <strong>{a.tabs ? `Fermer ${a.tabs.filter((t) => t.close && !skipped.has(t.url)).length} onglets sans rapport` : actionTitle(a, plan.block.link)}</strong>
-                  <p>{a.reason}</p>
+                  <strong className={isAlert(a) ? "alert-title" : undefined}>{a.tabs ? `Fermer ${a.tabs.filter((t) => t.close && !skipped.has(t.url)).length} onglets sans rapport` : a.tool === "check_needs" ? needsView(a).title : actionTitle(a, plan.block.link)}</strong>
+                  <Lines text={a.tool === "check_needs" ? needsView(a).reason : a.reason} alert={a.tool === "check_device" && a.reason !== "Rien d'anormal détecté."} />
+                  {a.tool === "check_needs" && needsDisplay ? <p className="microcopy live-hint">● en direct : je surveille l'écran, cette ligne change dès que tu branches.</p> : null}
                   {a.tabs ? (
                     <button type="button" className="link-button" onClick={() => setOpenTabs(openTabs === a.id ? null : a.id)}>
                       {openTabs === a.id ? "Masquer le détail" : "Voir onglet par onglet"}
@@ -375,7 +412,9 @@ function Evening() {
   const [journal, setJournal] = useState<ActionLogEntry[]>([]);
   const [day, setDay] = useState<DayBlock[]>([]);
   const [tomorrow, setTomorrow] = useState<DayBlock[]>([]);
+  const [tomorrowAll, setTomorrowAll] = useState<DayBlock[]>([]);
   const [clock, setClock] = useState("18:00");
+  const [clockIso, setClockIso] = useState<string | null>(null);
   const [done, setDone] = useState<Record<string, boolean>>({});
   const [rest, setRest] = useState("");
   const [saved, setSaved] = useState(false);
@@ -384,7 +423,9 @@ function Evening() {
     void Promise.all([window.api.journal(), window.api.day(), window.api.tomorrow(), window.api.clock()]).then(([j, d, t, c]) => {
       setJournal(j);
       setTomorrow(t.slice(0, 3));
+      setTomorrowAll(t);
       setClock(c.hhmm);
+      setClockIso(c.iso);
       const blocks = d.filter((b) => b.kind !== "free");
       setDay(blocks);
       const toMin = (x: string) => Number(x.slice(0, 2)) * 60 + Number(x.slice(3, 5));
@@ -399,12 +440,11 @@ function Evening() {
   const toggle = (b: DayBlock, value: boolean) => {
     const next = { ...done, [b.id]: value };
     setDone(next);
-    // La liste « pour demain » suit les tâches du brief non faites.
-    setRest(day.filter((x) => x.source === "morning" && !next[x.id]).map((x) => x.title).join(", "));
+    // La liste « pour demain » suit tout ce qui n'est pas fait : tâches du brief, et meetings à replanifier.
+    setRest(day.filter((x) => !next[x.id]).map((x) => (x.kind === "meeting" ? `replanifier « ${x.title} »` : x.title)).join(", "));
   };
 
-  const now = new Date();
-  now.setHours(Number(clock.slice(0, 2)), Number(clock.slice(3, 5)), 0, 0);
+  const now = clockIso ? new Date(clockIso) : new Date();
   const stats = weekStats(journal, now, !journal.some((e) => e.status === "done" && e.tool !== "check_device"), 1);
   const freedGo = (stats.freedMb + stats.freedDiskMb) / 1024;
 
@@ -427,6 +467,8 @@ function Evening() {
         <div><strong>{stats.issues}</strong><span>problèmes repérés</span></div>
         <div><strong>{freedGo.toFixed(1).replace(".", ",")}</strong><span>Go libérés</span></div>
       </div>
+
+      <Bag blocks={tomorrowAll} title="Dans ton sac pour demain" />
 
       {day.length ? (
         <div>
@@ -466,5 +508,34 @@ function Evening() {
         <button className="run-button" onClick={saved ? () => window.api.closePopup() : save}>{saved ? "À demain" : "Garder pour demain"}</button>
       </div>
     </>
+  );
+}
+
+/** Matériel à emporter, avec le premier bloc qui en a besoin. Rien à afficher → rien. */
+function Bag({ blocks, title }: { blocks: DayBlock[]; title: string }) {
+  const items = bagList(blocks);
+  if (!items.length) return null;
+  return (
+    <div className="bag">
+      <p className="eyebrow"><Backpack size={11} /> {title}</p>
+      <ul>
+        {items.map((i) => (
+          <li key={i.item}><strong>{i.item}</strong><span className="microcopy"> · pour « {i.for} » à {i.at}</span></li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** Texte d'une action, ligne par ligne : ⚠ en rouge, ✓ en vert. `alert` = tout le texte est une alerte. */
+function Lines({ text, alert }: { text: string; alert?: boolean }) {
+  return (
+    <p>
+      {text.split("\n").map((l, i) => (
+        <span key={i} className={alert || l.startsWith("⚠") ? "line-alert" : l.startsWith("✓") ? "line-ok" : undefined} style={{ display: "block" }}>
+          {l}
+        </span>
+      ))}
+    </p>
   );
 }

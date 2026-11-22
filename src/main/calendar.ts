@@ -9,7 +9,7 @@
 import { app } from "electron";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { setCalendar } from "./day";
+import { clearMorning, setCalendar } from "./day";
 import { icsToBlocks } from "./ics";
 import { now } from "./clock";
 import type { CalendarInfo } from "../shared/types";
@@ -25,6 +25,20 @@ export function tomorrowBlocks() {
   return icsToBlocks(lastIcs.ics, d, lastIcs.demo);
 }
 let timer: NodeJS.Timeout | null = null;
+/** Jour pour lequel la journée a été chargée (horloge de l'app). */
+let loadedFor = "";
+
+/**
+ * Changement de jour (minuit, ou « demain » dans l'horloge de démo) : on oublie les tâches du brief d'hier
+ * et on recharge les meetings du nouveau jour. Renvoie true si le jour a changé.
+ */
+export async function ensureToday(): Promise<boolean> {
+  const key = now().toDateString();
+  if (key === loadedFor) return false;
+  if (loadedFor) clearMorning();
+  await loadCalendar();
+  return true;
+}
 
 export const calendarInfo = () => info;
 
@@ -47,6 +61,7 @@ async function readSource(): Promise<{ ics: string; info: Omit<CalendarInfo, "ev
 
 /** Charge (ou recharge) le calendrier du jour. En cas d'erreur, retombe sur la démo. */
 export async function loadCalendar(): Promise<CalendarInfo> {
+  loadedFor = now().toDateString();
   try {
     const { ics, info: src } = await readSource();
     const blocks = icsToBlocks(ics, now(), src.source === "demo");

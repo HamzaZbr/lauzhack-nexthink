@@ -7,7 +7,8 @@ import { getDay, getMaintenanceSlot, toMin } from "./day";
 import { now } from "./clock";
 import { appMatches, isProtected } from "../shared/apps";
 import { riskOf } from "./actions";
-import { takeSnapshot } from "./sensors";
+import { readDisplays, takeSnapshot } from "./sensors";
+import { hasNeeds, needsCheck } from "../shared/needs";
 import { getTriage } from "./agent";
 import { hasKey } from "./llm";
 import { planWorkspace } from "./workspace";
@@ -33,6 +34,7 @@ export function nextBlock(): DayBlock | null {
 
 const HEAVY_MB = 500;
 
+
 export async function planPreflight(): Promise<PreflightPlan> {
   const next = nextBlock();
   const n0 = nowMin();
@@ -50,6 +52,17 @@ export async function planPreflight(): Promise<PreflightPlan> {
     { tool: "check_device", target: "Batterie, disque, mémoire, Wi-Fi" },
     snapshot.issues.length ? snapshot.issues.map((i) => i.message).join(" ") : "Rien d'anormal détecté.",
   );
+
+  // 1 bis. Besoins du bloc : internet, batterie, écran externe, matériel (lecture seule)
+  if (next && hasNeeds(next.needs)) {
+    const displays = next.needs?.display ? await readDisplays() : null;
+    const { lines, alerts } = needsCheck(next, snapshot, displays);
+    if (lines.length)
+      add(
+        { tool: "check_needs", target: alerts ? `${alerts} chose${alerts > 1 ? "s" : ""} à régler avant « ${block.title} »` : `Ce dont « ${block.title} » a besoin`, args: { summary: lines.join(" "), alerts } },
+        lines.join("\n"),
+      );
+  }
 
   // 2. Apps lourdes qui ne servent pas au bloc
   snapshot.apps

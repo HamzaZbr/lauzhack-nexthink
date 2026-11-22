@@ -29,9 +29,7 @@ export function Week() {
 
   // Le journal est daté avec l'horloge de l'app : on prend sa date du jour, pas celle de l'ordinateur.
   const now = useMemo(() => {
-    const d = new Date();
-    if (clock) d.setHours(Number(clock.hhmm.slice(0, 2)), Number(clock.hhmm.slice(3)), 0, 0);
-    return d;
+    return clock ? new Date(clock.iso) : new Date();
   }, [clock]);
 
   const hasReal = journal.some((e) => e.status === "done" && e.tool !== "check_device");

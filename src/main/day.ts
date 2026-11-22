@@ -56,6 +56,11 @@ export function setMorningBlocks(blocks: DayBlock[]) {
   onChange(getDay());
 }
 
+/** Nouveau jour : les tâches du brief d'hier ne restent pas (ce qui restait est repris par le bilan → brief). */
+export function clearMorning() {
+  morning = [];
+}
+
 export function setCalendar(blocks: DayBlock[]) {
   calendar = blocks;
   onChange(getDay());

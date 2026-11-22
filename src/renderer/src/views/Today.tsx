@@ -18,6 +18,7 @@ export function Today() {
     const off = window.api.onEvent((e) => {
       if (e.type === "day-updated") setDay(e.payload as DayBlock[]);
       if (e.type === "clock-updated") setClock(e.payload as ClockState);
+      if (e.type === "calendar-updated") setCal(e.payload as CalendarInfo);
     });
     return () => {
       clearInterval(t);
@@ -37,7 +38,7 @@ export function Today() {
     <div className="page-stack">
       <div className="toolbar-row">
         <span className="microcopy">
-          {cal ? `${cal.label} · ${cal.events} meeting${cal.events > 1 ? "s" : ""} aujourd'hui` : "…"}
+          {cal ? `${cal.label} · ${cal.events} meeting${cal.events > 1 ? "s" : ""} ${clock && clock.dayOffset !== 0 ? `le ${clock.dayLabel}` : "aujourd'hui"}` : "…"}
           {cal?.error ? ` · erreur : ${cal.error}` : ""}
         </span>
         <button className="filter-chip" onClick={reload}><RefreshCw size={12} /> recharger</button>
@@ -55,6 +56,11 @@ export function Today() {
               <br />
               <strong>{block.title}</strong>
               {block.apps.length ? <p className="microcopy">{block.apps.join(" · ")}</p> : null}
+              {block.needs?.gear.length || block.needs?.display ? (
+                <p className="microcopy needs-line">
+                  {[block.needs.display ? "présentation · écran externe" : null, block.needs.gear.length ? `à prévoir : ${block.needs.gear.join(", ")}` : null].filter(Boolean).join(" · ")}
+                </p>
+              ) : null}
             </div>
             {block.id === nextId ? <span className="risk-tag" data-risk="confirm">prochain · pre-flight à T-5 min</span> : null}
             {block.kind === "free" ? <span className="risk-tag" data-risk="auto"><Coffee size={11} /> maintenance possible</span> : null}

@@ -9,13 +9,13 @@ import { hasKey, model, ping } from "./llm";
 import { closePopup, openPopup, showDashboard, toDashboard } from "./windows";
 import { catalog, getJournal, initJournal, runActions, undo } from "./actions";
 import { planPreflight } from "./planner";
-import { takeSnapshot } from "./sensors";
+import { readDisplays, takeSnapshot } from "./sensors";
 import { getDay, onDayChange } from "./day";
 import { getTriage, planDay } from "./agent";
 import { getCarryOver, recordFeedback, setCarryOver } from "./prefs";
 import { cleanupPlan } from "./cleanup";
 import { nextBlock } from "./planner";
-import { calendarInfo, loadCalendar, tomorrowBlocks } from "./calendar";
+import { calendarInfo, ensureToday, loadCalendar, tomorrowBlocks } from "./calendar";
 import { clockState, setDemoTime } from "./clock";
 import { resetScheduler, startScheduler } from "./scheduler";
 import type { ActionRequest, PopupKind } from "../shared/types";
@@ -56,6 +56,7 @@ function registerIpc() {
     showDashboard(view);
   });
   ipcMain.handle("device:snapshot", (_e, fresh?: boolean) => takeSnapshot(fresh ?? true));
+  ipcMain.handle("device:displays", () => readDisplays());
   ipcMain.handle("actions:catalog", () => catalog());
   ipcMain.handle("preflight:plan", () => planPreflight());
   ipcMain.handle("actions:run", (_e, requests: ActionRequest[]) => runActions(requests));
@@ -84,9 +85,11 @@ function registerIpc() {
   );
   ipcMain.handle("calendar:reload", () => loadCalendar());
   ipcMain.handle("clock:get", () => clockState());
-  ipcMain.handle("clock:set", (_e, value: string | null) => {
-    setDemoTime(typeof value === "string" && /^\d{2}:\d{2}$/.test(value) ? value : null);
+  ipcMain.handle("clock:set", async (_e, value: string | null, nextDay?: boolean) => {
+    setDemoTime(typeof value === "string" && /^\d{2}:\d{2}$/.test(value) ? value : null, nextDay === true);
+    await ensureToday(); // nouveau jour → meetings du jour rechargés, tâches d'hier oubliées
     toDashboard("clock-updated", clockState());
+    toDashboard("calendar-updated", calendarInfo());
     resetScheduler();
     return clockState();
   });

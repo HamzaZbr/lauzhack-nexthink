@@ -60,12 +60,20 @@ L'app lit l'invitation (titre, description, lieu). Sans indice, elle ne sait pas
 | `.docx`, « Word » | Word |
 | Un nom de fichier (`budget_q4.xlsx`) | Le fichier est cherché sur ton Mac et proposé à l'ouverture avant le meeting |
 | Un ordre du jour | Donné à l'IA pour trier les onglets (ex. elle garde le doc mentionné) |
+| « présenter », « projecteur », « pitch », « soutenance » | Tu présentes : adaptateur HDMI dans le sac la veille, et à T-5 l'app vérifie qu'un écran externe est branché |
+| « HDMI », « chargeur », « casque », « clé USB » | Ajouté à la liste « Dans ton sac » |
+| Un lien de visio, « en ligne », « GitHub »… | Besoin d'internet : à T-5, le Wi-Fi est vérifié |
+| Un bloc de 90 min ou plus | Batterie vérifiée à T-5 (branche-toi si < 50 %) |
+
+« Préparer le pitch » ne compte **pas** comme une présentation (pas d'écran à brancher) ; « présenter le pitch » ou « pitch devant le jury » oui.
 
 **Exemple d'invitation idéale**
 - Titre : `Revue budget avec Finance`
-- Description : `Ordre du jour : valider budget_q4.xlsx. Teams : https://teams.microsoft.com/l/meetup-join/…`
+- Description : `Tu présentes les chiffres au projecteur, salle BC 410. Document : budget_q4.xlsx. Teams : https://teams.microsoft.com/l/meetup-join/…`
 
 **Attention avec un vrai agenda :** Google et Outlook ne mettent pas leur lien ICS à jour instantanément (de quelques minutes à plusieurs heures). Un meeting que tu viens d'ajouter peut ne pas apparaître : bouton « recharger » au-dessus de la timeline, ou calendrier de démo.
+
+**Agenda de démo sur deux jours :** `resources/outlook-preflight-22-23nov.ics` (dimanche 22 + lundi 23). À importer dans Outlook, ou à lire directement : `CALENDAR_ICS_FILE=/Users/hamza/Desktop/bsa/lauzhack-nexthink/resources/outlook-preflight-22-23nov.ics`. Le bouton **demain 08:30** de l'horloge passe au lundi : meetings du lundi, tâches de la veille oubliées, ce qui restait repris dans le brief.
 
 ## 4. Le scénario de démo (≈ 3 min)
 
@@ -82,7 +90,7 @@ L'app lit l'invitation (titre, description, lieu). Sans indice, elle ne sait pas
 4. « Préparer » → Spotify et les onglets se ferment.
 5. **Journal** → « Annuler » sur une action → elle revient.
 6. Sidebar → **10:45 café** → « je peux libérer X Go pendant ta pause » : caches reconstructibles cochés, Corbeille et vieux téléchargements à cocher (« demande »), mise à jour placée avant le meeting de 11:30.
-7. Sidebar → **18:00 bilan** → les chiffres du jour, cocher ce qui est fait, « Garder pour demain ».
+7. Sidebar → **18:00 bilan** → les chiffres du jour, **« Dans ton sac pour demain : adaptateur HDMI »**, cocher ce qui est fait, « Garder pour demain ».
 8. **Semaine** → « seulement le réel » → ce que l'agent a fait gagner, avec les hypothèses.
 9. (Option) **08:30 brief** à nouveau → ce qui restait est déjà pré-rempli.
 
@@ -104,11 +112,16 @@ L'app lit l'invitation (titre, description, lieu). Sans indice, elle ne sait pas
 | 10 | Journal : Annuler | Spotify se rouvre | ✅ |
 | 11 | Mode réel : fermer des onglets | Les onglets se ferment, la ligne du journal dit « fait · N onglet(s) » | à revérifier |
 | 12 | Après une action | L'arbre se met à jour seul (~1,5 s) | à revérifier |
-| 13 | 10:45 café → « Vas-y » | Tailles mesurées (Go), actions faites ou simulées dans le journal, « Disque libéré » sur Semaine | à revérifier |
-| 14 | Semaine → « seulement le réel » | Chiffres = actions faites du journal | à revérifier |
+| 13 | 10:45 café → « Vas-y » | Tailles mesurées (Go), actions faites ou simulées dans le journal, « Disque libéré » sur Semaine | ✅ OK |
+| 14 | Semaine → « seulement le réel » | Chiffres = actions faites du journal | ✅ OK |
 | 15 | `npm run bench:llm` | Tableau erreurs graves / oublis par modèle | ✅ |
+| 18 | 18:00 bilan | « Dans ton sac pour demain : adaptateur USB-C → HDMI · pour « Revue budget avec Finance » à 11:30 » | à vérifier |
+| 19 | « aller à » 11:25 (sans écran externe branché) | Pre-flight : « ⚠ Tu présentes à 11:30 et aucun écran externe n'est branché… » en tête, et « ● en direct » | ✅ |
+| 20 | Pop-up du test 19 ouvert, branche un écran / une TV / un projecteur | En 3 s, l'alerte devient « ✓ Écran externe branché (nom) » et le titre « Tout est prêt » (ou une chose de moins à régler) | à vérifier |
+| 21 | Brief « présenter le pitch à 12h30 », puis 12:25 | Même alerte écran + HDMI dans « À avoir sur toi aujourd'hui » | à vérifier |
+| 22 | 18:00 bilan → « Garder pour demain » → bouton **demain 08:30** | Horloge « lun. 23 nov. · J+1 », meetings du lundi (avec le fichier Outlook), tâches d'hier disparues, brief pré-rempli avec ce qui restait | à vérifier |
 | 16 | Brief avec « le fichier budget_q4 » et « sur GitHub », puis « aller à » 13:55 | Pre-flight : « Ouvrir budget_q4.xlsx », onglet GitHub mis devant ou ouvert | à vérifier |
-| 17 | 18:00 bilan → « Garder pour demain » → 08:30 brief | Le brief est pré-rempli avec ce qui restait | à vérifier |
+| 17 | 18:00 bilan → « Garder pour demain » → **demain 08:30** | Le brief du lendemain est pré-rempli avec ce qui restait (pas le soir même, pas à chaque relance) ; effacé dès qu'un brief est planifié | ✅ |
 
 ## 6. Si quelque chose ne marche pas
 

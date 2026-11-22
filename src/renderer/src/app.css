@@ -193,3 +193,16 @@ button, input, textarea, select, a { -webkit-app-region: no-drag; }
 .tab-list-full em { display: block; margin-left: 0 !important; }
 .tab-list-full li[data-close="true"] strong { color: var(--np-accent-coral); }
 .tab-list-full li:not([data-sel="true"]) { opacity: 0.6; }
+
+/* Besoins d'un bloc : matériel à emporter */
+.bag { border: 1px dashed var(--np-line-strong); padding: 10px 12px; }
+.bag ul { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 4px; }
+.bag li { font-size: 13px; }
+.bag .eyebrow { display: flex; align-items: center; gap: 6px; }
+.needs-line { color: var(--np-accent-coral); }
+.live-hint { color: var(--np-accent-blue); margin-top: 4px; }
+
+/* Alertes du pre-flight : bien visibles */
+.line-alert { color: var(--np-accent-coral); font-weight: 600; }
+.line-ok { color: #2e8b57; font-weight: 600; }
+.action-row strong.alert-title, .alert-title { color: var(--np-accent-coral); }

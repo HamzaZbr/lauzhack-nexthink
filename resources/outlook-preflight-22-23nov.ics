@@ -1,0 +1,95 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Preflight//LauzHack Outlook import//FR
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VTIMEZONE
+TZID:Europe/Zurich
+BEGIN:STANDARD
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+END:STANDARD
+BEGIN:DAYLIGHT
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+END:DAYLIGHT
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:preflight-sync-20261122@lauzhack
+DTSTAMP:20261122T000000Z
+DTSTART;TZID=Europe/Zurich:20261122T100000
+DTEND;TZID=Europe/Zurich:20261122T104500
+SUMMARY:Sync équipe produit
+LOCATION:Microsoft Teams
+DESCRIPTION:Ordre du jour : avancement de la démo\, répartition du travail.\nRejoindre la réunion Microsoft Teams : https://teams.microsoft.com/l/meetup-join/preflight-demo-sync
+END:VEVENT
+BEGIN:VEVENT
+UID:preflight-budget-20261122@lauzhack
+DTSTAMP:20261122T000000Z
+DTSTART;TZID=Europe/Zurich:20261122T113000
+DTEND;TZID=Europe/Zurich:20261122T120000
+SUMMARY:Revue budget avec Finance
+LOCATION:Salle BC 410 (projecteur)
+DESCRIPTION:Tu présentes les chiffres du trimestre au projecteur. Document : budget_q4.xlsx (Excel). Préparer les écarts > 10 %.\nTeams pour ceux à distance : https://teams.microsoft.com/l/meetup-join/preflight-demo-budget
+END:VEVENT
+BEGIN:VEVENT
+UID:preflight-pitch-20261122@lauzhack
+DTSTAMP:20261122T000000Z
+DTSTART;TZID=Europe/Zurich:20261122T123000
+DTEND;TZID=Europe/Zurich:20261122T124500
+SUMMARY:Pitch LauzHack devant le jury
+LOCATION:LauzHack\, EPFL
+DESCRIPTION:Présenter Preflight au jury Nexthink : démo live sur écran externe. Prendre l'adaptateur HDMI et le chargeur.
+END:VEVENT
+BEGIN:VEVENT
+UID:preflight-1on1-20261122@lauzhack
+DTSTAMP:20261122T000000Z
+DTSTART;TZID=Europe/Zurich:20261122T150000
+DTEND;TZID=Europe/Zurich:20261122T153000
+SUMMARY:1:1 avec Sarah
+LOCATION:Zoom
+DESCRIPTION:Point hebdo : retours sur le rapport\, priorités de la semaine.\nZoom : https://epfl.zoom.us/j/123456789
+END:VEVENT
+BEGIN:VEVENT
+UID:preflight-daily-20261123@lauzhack
+DTSTAMP:20261122T000000Z
+DTSTART;TZID=Europe/Zurich:20261123T090000
+DTEND;TZID=Europe/Zurich:20261123T093000
+SUMMARY:Daily équipe produit
+LOCATION:Microsoft Teams
+DESCRIPTION:Tour de table : hier\, aujourd'hui\, blocages.\nRejoindre la réunion Microsoft Teams : https://teams.microsoft.com/l/meetup-join/preflight-demo-daily
+END:VEVENT
+BEGIN:VEVENT
+UID:preflight-comite-20261123@lauzhack
+DTSTAMP:20261122T000000Z
+DTSTART;TZID=Europe/Zurich:20261123T103000
+DTEND;TZID=Europe/Zurich:20261123T113000
+SUMMARY:Résultats Q4 au comité de direction
+LOCATION:Salle CO 1 (projecteur)
+DESCRIPTION:Tu présentes les résultats du trimestre au projecteur. Support : resultats_q4.pptx (PowerPoint)\, chiffres dans budget_q4.xlsx.
+END:VEVENT
+BEGIN:VEVENT
+UID:preflight-workshop-20261123@lauzhack
+DTSTAMP:20261122T000000Z
+DTSTART;TZID=Europe/Zurich:20261123T140000
+DTEND;TZID=Europe/Zurich:20261123T160000
+SUMMARY:Workshop sécurité informatique
+LOCATION:Salle BC 01
+DESCRIPTION:Atelier pratique sur ton laptop (2 h\, peu de prises dans la salle). Lien du support en ligne : https://moodle.epfl.ch/
+END:VEVENT
+BEGIN:VEVENT
+UID:preflight-1on1-20261123@lauzhack
+DTSTAMP:20261122T000000Z
+DTSTART;TZID=Europe/Zurich:20261123T163000
+DTEND;TZID=Europe/Zurich:20261123T170000
+SUMMARY:1:1 avec Sarah
+LOCATION:Zoom
+DESCRIPTION:Point hebdo : retour sur le comité de ce matin.\nZoom : https://epfl.zoom.us/j/123456789
+END:VEVENT
+END:VCALENDAR

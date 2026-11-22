@@ -198,8 +198,8 @@ function DemoClock() {
   ];
 
   const [custom, setCustom] = useState("13:55");
-  const set = async (hhmm: string | null) => {
-    setClock(await window.api.setClock(hhmm));
+  const set = async (hhmm: string | null, nextDay = false) => {
+    setClock(await window.api.setClock(hhmm, nextDay));
     if (hhmm === "08:30") void window.api.openPopup("morning");
   };
 
@@ -207,12 +207,16 @@ function DemoClock() {
     <div className="demo-clock">
       <p className="section-trigger"><Clock size={13} /> Horloge {clock?.demo ? "· démo" : ""}</p>
       <strong className="demo-time">{clock?.hhmm ?? "--:--"}</strong>
+      {clock?.dayOffset ? <p className="microcopy">{clock.dayLabel} · {clock.dayOffset > 0 ? `J+${clock.dayOffset}` : `J${clock.dayOffset}`}</p> : null}
       <div className="demo-buttons">
         {times.map((t) => (
           <button key={t.label} className="filter-chip" data-active={clock?.hhmm === t.hhmm} onClick={() => set(t.hhmm)} title={`Mettre l'horloge à ${t.hhmm}`}>
             {t.hhmm} <span className="microcopy">{t.label}</span>
           </button>
         ))}
+        <button className="filter-chip" onClick={() => set("08:30", true)} title="Passer au lendemain, 08:30 : meetings de demain, tâches d'hier oubliées, brief pré-rempli avec ce qui restait">
+          demain <span className="microcopy">08:30</span>
+        </button>
         {clock?.demo ? <button className="filter-chip" onClick={() => set(null)}>heure réelle</button> : null}
       </div>
       <form className="demo-custom" onSubmit={(e) => { e.preventDefault(); void set(custom); }}>

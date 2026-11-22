@@ -7,12 +7,15 @@
 import { app } from "electron";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { now } from "./clock";
 
 interface Prefs {
   keepDomains: Record<string, number>;
   closeDomains: Record<string, number>;
   /** Ce que tu as noté au bilan du soir, repris dans le brief du lendemain. */
   carryOver?: string;
+  /** Jour (horloge de l'app) où « ce qui reste » a été noté : on ne le propose qu'à partir du lendemain. */
+  carryOverDay?: string;
 }
 
 const path = () => join(app.getPath("userData"), "prefs.json");
@@ -36,9 +39,18 @@ function save() {
   }
 }
 
-export const getCarryOver = () => load().carryOver ?? "";
+/**
+ * « Ce qui reste » du bilan, proposé dans le brief du LENDEMAIN seulement (pas le soir même, pas à chaque relance).
+ * Effacé dès qu'un brief est planifié.
+ */
+export const getCarryOver = () => {
+  const p = load();
+  if (!p.carryOver || !p.carryOverDay || p.carryOverDay === now().toDateString()) return "";
+  return p.carryOver;
+};
 export function setCarryOver(text: string) {
   load().carryOver = text.slice(0, 500);
+  load().carryOverDay = now().toDateString();
   save();
 }
 

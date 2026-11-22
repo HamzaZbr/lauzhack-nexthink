@@ -9,6 +9,7 @@ import { now } from "./clock";
 import { openPopup } from "./windows";
 import { getTriage } from "./agent";
 import { takeSnapshot } from "./sensors";
+import { ensureToday } from "./calendar";
 
 const PREFLIGHT_MINUTES = 5;
 const EVENING = process.env.EVENING_AT && /^\d{2}:\d{2}$/.test(process.env.EVENING_AT) ? process.env.EVENING_AT : "18:00";
@@ -16,6 +17,8 @@ const fired = new Set<string>();
 let timer: NodeJS.Timeout | null = null;
 
 export function tick() {
+  // Minuit passé (vraie heure ou démo) : journée rechargée, puis on regarde au prochain tour.
+  void ensureToday().catch(() => {});
   const d = now();
   const nowMin = d.getHours() * 60 + d.getMinutes();
   // Bilan de fin de journée (une fois par jour)

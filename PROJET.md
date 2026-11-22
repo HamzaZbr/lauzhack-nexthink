@@ -113,9 +113,10 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire
 - [x] **Bilan de fin de journée** (18:00, ou bouton « bilan ») : temps gagné, actions, problèmes et Go libérés du jour ; coche ce qui est fait ; « ce qui reste » est repris dans le brief du lendemain ; aperçu des meetings de demain
 
 ### Bloc 2 : maintenance (23:30–01:30)
-- [ ] Trouver les créneaux libres dans le calendrier
-- [ ] Pop-up café déclenché au début du créneau
-- [ ] Nettoyage disque proposé (caches, Corbeille), toujours en « demande »
+- [x] Trouver les créneaux libres dans le calendrier
+- [x] Pop-up café déclenché au début du créneau
+- [x] Nettoyage disque proposé (caches, Corbeille) — **testé en réel** : cache pip vidé, 499 Mo libérés
+- [x] **Tests 1-2-3 validés sur le Mac (21/11, minuit)** : espace de travail, pause café (simulé + réel), bilan + reprise dans le brief du lendemain
 
 ### Finitions (01:30–03:00, puis 07:00–09:30)
 - [x] Semaine : chiffres calculés depuis le journal (temps gagné avec hypothèses affichées, barres par jour, simulations comptées à part)
@@ -123,6 +124,9 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire
 - [ ] Dormir (03:00–07:00)
 
 ### Pitch (10:00–12:00)
+- [x] **Last feature : les besoins de chaque bloc** (remplace les processus en arrière-plan, abandonnés) : internet, écran externe, batterie, matériel. Déduits de l'invitation (règles) et du brief (LLM + règles). La veille au soir et le matin : « Dans ton sac : adaptateur HDMI, chargeur ». À T-5 : Wi-Fi faible, batterie < 50 % sur un bloc long, aucun écran externe alors que tu présentes → alerte. Lecture seule, aucune action sur le Mac
+- [x] Changement de jour : bouton « demain 08:30 », meetings du lendemain rechargés, tâches de la veille oubliées (aussi à minuit en vrai)
+- [ ] Tester les besoins et le changement de jour sur le Mac (GUIDE.md, tests 18 à 22)
 - [ ] 3-4 slides : qui, quelle douleur, démo, sécurité, prochaines étapes
 - [ ] Vidéo de secours de la démo
 - [ ] Répéter 3 min · push final avant 12:00

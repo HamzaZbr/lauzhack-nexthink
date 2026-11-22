@@ -1,6 +1,7 @@
 /** Lecture d'un .ics → meetings du jour (fonctions pures, testables sans Electron). */
 import * as ical from "node-ical";
 import type { DayBlock } from "../shared/types";
+import { needsFromText } from "../shared/needs";
 
 export const text = (v: unknown): string => (typeof v === "string" ? v : (v as { val?: string } | undefined)?.val ?? "");
 const hhmm = (d: Date) => `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
@@ -50,6 +51,7 @@ export function icsToBlocks(ics: string, day: Date, mapToToday = false): DayBloc
         apps: appsFor(blob, link),
         link,
         docs: [...new Set((blob.match(/[\w.-]+\.(xlsx|xls|csv|docx|doc|pptx|ppt|key|pages|numbers|pdf)\b/gi) ?? []).map((f) => f.replace(/\.[a-z]+$/i, "")))].slice(0, 3),
+        needs: needsFromText(blob, { link, minutes: Math.round((inst.end.getTime() - inst.start.getTime()) / 60_000) }),
         notes: text(inst.ev.description).replace(/https?:\/\/\S+/g, "").replace(/\s+/g, " ").trim().slice(0, 300) || undefined,
       });
     }

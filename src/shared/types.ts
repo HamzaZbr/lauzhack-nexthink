@@ -21,6 +21,24 @@ export interface DayBlock {
   sites?: string[];
   /** Mots-clés de documents (ex. budget_q4) : cherchés sur le Mac et ouverts avant le bloc. */
   docs?: string[];
+  /** Ce dont le bloc a besoin : internet, écran externe, batterie, matériel à emporter. */
+  needs?: BlockNeeds;
+}
+
+export interface BlockNeeds {
+  internet: boolean;
+  /** Tu projettes / présentes : il faut un écran externe branché. */
+  display: boolean;
+  /** Bloc long ou loin d'une prise : batterie à surveiller. */
+  power: boolean;
+  /** Matériel à avoir sur soi (ex. « adaptateur USB-C → HDMI », « chargeur »). */
+  gear: string[];
+}
+
+/** Écrans branchés au Mac (lu avec system_profiler). */
+export interface DisplayInfo {
+  external: number;
+  names: string[];
 }
 
 /** Une action que l'agent propose. Le LLM choisit `tool` dans le catalogue ; le code décide du risque. */
@@ -70,6 +88,12 @@ export interface CalendarInfo {
 export interface ClockState {
   hhmm: string;
   demo: boolean;
+  /** Date et heure de l'app (ISO), horloge de démo comprise. */
+  iso: string;
+  /** Jour affiché, ex. « lun. 23 nov. » */
+  dayLabel: string;
+  /** 0 = aujourd'hui (vrai jour), 1 = demain… */
+  dayOffset: number;
 }
 
 export interface CleanupItem {
@@ -105,6 +129,8 @@ export interface ActionLogEntry {
   at: string; // ISO
   tool: string;
   target: string;
+  /** Nom lisible de la cible quand target est un identifiant (ex. "pip" → "Cache pip"). */
+  title?: string;
   risk: Risk;
   status: "done" | "undone" | "failed" | "simulated";
   detail: string;
@@ -193,6 +219,8 @@ export interface PreflightApi {
   popupAnswer(kind: PopupKind, data: unknown): Promise<void>;
   showDashboard(view?: string): Promise<void>;
   snapshot(fresh?: boolean): Promise<DeviceSnapshot>;
+  /** Écrans branchés, lus en direct (le pop-up pre-flight surveille le branchement). */
+  displays(): Promise<DisplayInfo | null>;
   catalog(): Promise<ToolInfo[]>;
   planPreflight(): Promise<PreflightPlan>;
   runActions(requests: ActionRequest[]): Promise<ActionLogEntry[]>;
@@ -203,7 +231,8 @@ export interface PreflightApi {
   calendarInfo(): Promise<CalendarInfo>;
   reloadCalendar(): Promise<CalendarInfo>;
   clock(): Promise<ClockState>;
-  setClock(hhmm: string | null): Promise<ClockState>;
+  /** `nextDay` : passer au lendemain (même heure HH:MM). */
+  setClock(hhmm: string | null, nextDay?: boolean): Promise<ClockState>;
   triageTabs(fresh?: boolean): Promise<TriageResponse>;
   tabsFeedback(keptDomains: string[], closedDomains: string[]): Promise<void>;
   cleanupPlan(): Promise<CleanupItem[]>;
