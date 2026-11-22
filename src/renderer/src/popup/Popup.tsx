@@ -50,7 +50,7 @@ function Morning() {
   const [carried, setCarried] = useState("");
 
   useEffect(() => {
-    window.api.day().then((d) => setCalendar(d.filter((b) => b.source === "calendar" && b.kind === "meeting")));
+    window.api.day().then((d) => setCalendar(d.filter((b) => b.source === "calendar" && b.kind !== "free")));
     window.api.clock().then((c) => setTime(c.hhmm));
     // Ce que tu avais noté au bilan d'hier soir
     window.api.carryOver().then((t) => {
@@ -103,14 +103,14 @@ function Morning() {
       </div>
       <div className="mini-blocks">
         {calendar.map((b) => (
-          <div key={b.id}><time>{b.start}</time><span>{b.title}</span></div>
+          <div key={b.id}><time>{b.start}</time><span>{b.title}{b.kind === "focus" ? <span className="microcopy"> · tâche</span> : null}</span></div>
         ))}
       </div>
       <Bag blocks={calendar} title="Avant de partir, prends" />
       <div className="dashed" />
       <div>
         <p className="microcopy" style={{ marginBottom: 8 }}>
-          Qu'est-ce que tu fais aujourd'hui en plus de ces meetings ? Une phrase suffit.
+          Qu'est-ce que tu fais aujourd'hui en plus de ton agenda ? Une phrase suffit.
           {carried ? " Repris de ton bilan d'hier :" : ""}
         </p>
         <textarea autoFocus value={text} onChange={(e) => setText(e.target.value)} disabled={busy}

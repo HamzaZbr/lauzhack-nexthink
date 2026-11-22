@@ -38,7 +38,7 @@ export function Today() {
     <div className="page-stack">
       <div className="toolbar-row">
         <span className="microcopy">
-          {cal ? `${cal.label} · ${cal.events} meeting${cal.events > 1 ? "s" : ""} ${clock && clock.dayOffset !== 0 ? `le ${clock.dayLabel}` : "aujourd'hui"}` : "…"}
+          {cal ? `${cal.label} · ${cal.events} événement${cal.events > 1 ? "s" : ""} ${clock && clock.dayOffset !== 0 ? `le ${clock.dayLabel}` : "aujourd'hui"}` : "…"}
           {cal?.error ? ` · erreur : ${cal.error}` : ""}
         </span>
         <button className="filter-chip" onClick={reload}><RefreshCw size={12} /> recharger</button>
