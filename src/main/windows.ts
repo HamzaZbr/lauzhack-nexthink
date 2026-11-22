@@ -83,7 +83,7 @@ export function openPopup(kind: PopupKind) {
   onPopup(kind);
 }
 
-export const MASCOT_SIZE = { width: 260, height: 210 };
+export const MASCOT_SIZE = { width: 280, height: 220 };
 
 /**
  * La mascotte : un petit personnage dans le coin bas droit, toujours devant, fond transparent.
@@ -98,7 +98,7 @@ export function showMascot() {
   mascot = new BrowserWindow({
     ...MASCOT_SIZE,
     x: area.x + area.width - MASCOT_SIZE.width - 12,
-    y: area.y + area.height - MASCOT_SIZE.height - 8,
+    y: area.y + area.height - MASCOT_SIZE.height, // collé au bord bas : le chien dépasse du bord
     frame: false,
     transparent: true,
     hasShadow: false,
@@ -113,12 +113,42 @@ export function showMascot() {
   mascot.setAlwaysOnTop(true, "floating");
   mascot.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
   mascot.once("ready-to-show", () => mascot?.showInactive());
-  mascot.on("closed", () => (mascot = null));
+  mascot.on("closed", () => {
+    mascot = null;
+    if (eyeTimer) clearInterval(eyeTimer);
+    eyeTimer = null;
+  });
+  // Les yeux suivent la souris : position du curseur relative aux yeux, ~20 fois par seconde.
+  let last = "";
+  eyeTimer = setInterval(() => {
+    if (!mascot || mascot.isDestroyed() || !mascot.isVisible()) return;
+    const p = screen.getCursorScreenPoint();
+    const b = mascot.getBounds();
+    const msg = `${p.x - (b.x + b.width - 80)},${p.y - (b.y + b.height - 50)}`;
+    if (msg === last) return;
+    last = msg;
+    const [dx, dy] = msg.split(",").map(Number);
+    mascot.webContents.send("event", { type: "cursor", payload: { dx, dy } });
+  }, 50);
   load(mascot, "/mascot");
   return mascot;
 }
 
 export const hideMascot = () => mascot?.hide();
+
+let eyeTimer: NodeJS.Timeout | null = null;
+let dragFrom: { x: number; y: number } | null = null;
+/** Déplacer la mascotte à la souris : début du glisser, puis décalage depuis ce début. */
+export function mascotDragStart() {
+  if (mascot && !mascot.isDestroyed()) {
+    const [x, y] = mascot.getPosition();
+    dragFrom = { x, y };
+  }
+}
+export function mascotDragMove(dx: number, dy: number) {
+  if (!mascot || mascot.isDestroyed() || !dragFrom) return;
+  mascot.setPosition(Math.round(dragFrom.x + dx), Math.round(dragFrom.y + dy));
+}
 
 /** Fait parler la mascotte : humeur + bulle de texte. */
 export function toMascot(mood: "idle" | "alert" | "happy" | "talk", text?: string) {

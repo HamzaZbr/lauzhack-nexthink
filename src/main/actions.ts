@@ -20,6 +20,7 @@ import { takeSnapshot, tabsScope } from "./sensors";
 import { now } from "./clock";
 import { isDocumentApp, isProtected } from "../shared/apps";
 import { TEMPLATES, isTemplateId, meetingNotes, newFromTemplate } from "./documents";
+import { isInstalled } from "./installed";
 import type { ActionLogEntry, ActionRequest, Risk, ToolInfo } from "../shared/types";
 
 const run = promisify(execFile);
@@ -217,6 +218,12 @@ const tools: ToolDef[] = [
       if (!SAFE_URL.test(req.target)) throw new Error("Lien refusé (seuls https, Teams, Zoom, Webex).");
     },
     execute: async (req) => {
+      // Un lien Zoom s'ouvre directement dans l'app Zoom (sans passer par le navigateur) quand elle est installée.
+      const z = /^https:\/\/([\w-]+\.)?zoom\.us\/j\/(\d{9,12})(?:\?pwd=([\w.-]+))?/i.exec(req.target);
+      if (z && isInstalled("zoom.us")) {
+        await run("open", [`zoommtg://zoom.us/join?confno=${z[2]}${z[3] ? `&pwd=${z[3]}` : ""}`]);
+        return { detail: `Réunion Zoom ${z[2]} ouverte directement dans Zoom.` };
+      }
       await run("open", [req.target]);
       return { detail: `Ouvert : ${req.target}` };
     },

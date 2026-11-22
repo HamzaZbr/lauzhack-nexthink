@@ -21,31 +21,37 @@ TZNAME:CEST
 END:DAYLIGHT
 END:VTIMEZONE
 BEGIN:VEVENT
-UID:preflight-sync-20261122@lauzhack
+UID:pf-deep-22@lauzhack
+DTSTAMP:20261122T000000Z
+DTSTART;TZID=Europe/Zurich:20261122T090000
+DTEND;TZID=Europe/Zurich:20261122T100000
+SUMMARY:Deep work : rapport Q4
+LOCATION:Bureau
+DESCRIPTION:Finir le rapport trimestriel à partir de budget_q4.xlsx. Notifications coupées\, pas de réunion.
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-sync-22@lauzhack
 ATTENDEE;CN=Sarah Keller;ROLE=REQ-PARTICIPANT:mailto:sarah@lemanic.example
 ATTENDEE;CN=Marc Dubois;ROLE=REQ-PARTICIPANT:mailto:marc@lemanic.example
 ATTENDEE;CN=Hamza Zoubayri;ROLE=REQ-PARTICIPANT:mailto:hamza@lemanic.example
 DTSTAMP:20261122T000000Z
 DTSTART;TZID=Europe/Zurich:20261122T100000
-DTEND;TZID=Europe/Zurich:20261122T104500
+DTEND;TZID=Europe/Zurich:20261122T103000
 SUMMARY:Sync équipe produit
 LOCATION:Microsoft Teams
-DESCRIPTION:Ordre du jour : avancement de la démo\, répartition du travail.\nRejoindre la réunion Microsoft Teams : https://teams.microsoft.com/l/meetup-join/preflight-demo-sync
+DESCRIPTION:Avancement de la démo\, répartition du travail.\nRejoindre la réunion Microsoft Teams : https://teams.microsoft.com/l/meetup-join/preflight-demo-sync
 END:VEVENT
 BEGIN:VEVENT
-UID:preflight-budget-20261122@lauzhack
-ATTENDEE;CN=Claire Martin (Finance);ROLE=REQ-PARTICIPANT:mailto:claire@lemanic.example
-ATTENDEE;CN=Sarah Keller;ROLE=REQ-PARTICIPANT:mailto:sarah@lemanic.example
-ATTENDEE;CN=Hamza Zoubayri;ROLE=REQ-PARTICIPANT:mailto:hamza@lemanic.example
+UID:pf-code-22@lauzhack
 DTSTAMP:20261122T000000Z
-DTSTART;TZID=Europe/Zurich:20261122T113000
-DTEND;TZID=Europe/Zurich:20261122T120000
-SUMMARY:Revue budget avec Finance
-LOCATION:Salle BC 410 (projecteur)
-DESCRIPTION:Tu présentes les chiffres du trimestre au projecteur. Document : budget_q4.xlsx (Excel). Préparer les écarts > 10 %.\nTeams pour ceux à distance : https://teams.microsoft.com/l/meetup-join/preflight-demo-budget
+DTSTART;TZID=Europe/Zurich:20261122T111500
+DTEND;TZID=Europe/Zurich:20261122T121500
+SUMMARY:Coder la PR #42 (Preflight)
+LOCATION:Bureau
+DESCRIPTION:Relire et corriger la PR dans Antigravity. https://github.com/ et https://stackoverflow.com/ pour les questions.
 END:VEVENT
 BEGIN:VEVENT
-UID:preflight-pitch-20261122@lauzhack
+UID:pf-pitch-22@lauzhack
 ATTENDEE;CN=Jury Nexthink;ROLE=REQ-PARTICIPANT:mailto:jury@lemanic.example
 ATTENDEE;CN=Hamza Zoubayri;ROLE=REQ-PARTICIPANT:mailto:hamza@lemanic.example
 DTSTAMP:20261122T000000Z
@@ -56,7 +62,16 @@ LOCATION:LauzHack\, EPFL
 DESCRIPTION:Présenter Preflight au jury Nexthink : démo live sur écran externe. Prendre l'adaptateur HDMI et le chargeur.
 END:VEVENT
 BEGIN:VEVENT
-UID:preflight-1on1-20261122@lauzhack
+UID:pf-ml-22@lauzhack
+DTSTAMP:20261122T000000Z
+DTSTART;TZID=Europe/Zurich:20261122T140000
+DTEND;TZID=Europe/Zurich:20261122T150000
+SUMMARY:Révisions CS-233 (Machine Learning)
+LOCATION:Bibliothèque
+DESCRIPTION:Exercices de la semaine 10 sur https://moodle.epfl.ch/ .
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-1on1-22@lauzhack
 ATTENDEE;CN=Sarah Keller;ROLE=REQ-PARTICIPANT:mailto:sarah@lemanic.example
 ATTENDEE;CN=Hamza Zoubayri;ROLE=REQ-PARTICIPANT:mailto:hamza@lemanic.example
 DTSTAMP:20261122T000000Z
@@ -67,7 +82,16 @@ LOCATION:Zoom
 DESCRIPTION:Point hebdo : retours sur le rapport\, priorités de la semaine.\nZoom : https://epfl.zoom.us/j/123456789
 END:VEVENT
 BEGIN:VEVENT
-UID:preflight-daily-20261123@lauzhack
+UID:pf-master-22@lauzhack
+DTSTAMP:20261122T000000Z
+DTSTART;TZID=Europe/Zurich:20261122T160000
+DTEND;TZID=Europe/Zurich:20261122T173000
+SUMMARY:Préparer la présentation du projet de master
+LOCATION:Bureau
+DESCRIPTION:Slides pour la soutenance intermédiaire du projet de master.
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-daily-23@lauzhack
 ATTENDEE;CN=Sarah Keller;ROLE=REQ-PARTICIPANT:mailto:sarah@lemanic.example
 ATTENDEE;CN=Marc Dubois;ROLE=REQ-PARTICIPANT:mailto:marc@lemanic.example
 ATTENDEE;CN=Hamza Zoubayri;ROLE=REQ-PARTICIPANT:mailto:hamza@lemanic.example
@@ -79,37 +103,44 @@ LOCATION:Microsoft Teams
 DESCRIPTION:Tour de table : hier\, aujourd'hui\, blocages.\nRejoindre la réunion Microsoft Teams : https://teams.microsoft.com/l/meetup-join/preflight-demo-daily
 END:VEVENT
 BEGIN:VEVENT
-UID:preflight-comite-20261123@lauzhack
+UID:pf-deep-23@lauzhack
+DTSTAMP:20261122T000000Z
+DTSTART;TZID=Europe/Zurich:20261123T093000
+DTEND;TZID=Europe/Zurich:20261123T110000
+SUMMARY:Deep work : analyse des résultats
+LOCATION:Bureau
+DESCRIPTION:Préparer les chiffres pour le comité à partir de budget_q4.xlsx.
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-comite-23@lauzhack
 ATTENDEE;CN=Direction Lémanic;ROLE=REQ-PARTICIPANT:mailto:direction@lemanic.example
 ATTENDEE;CN=Claire Martin (Finance);ROLE=REQ-PARTICIPANT:mailto:claire@lemanic.example
 ATTENDEE;CN=Hamza Zoubayri;ROLE=REQ-PARTICIPANT:mailto:hamza@lemanic.example
 DTSTAMP:20261122T000000Z
-DTSTART;TZID=Europe/Zurich:20261123T103000
-DTEND;TZID=Europe/Zurich:20261123T113000
+DTSTART;TZID=Europe/Zurich:20261123T110000
+DTEND;TZID=Europe/Zurich:20261123T120000
 SUMMARY:Résultats Q4 au comité de direction
 LOCATION:Salle CO 1 (projecteur)
-DESCRIPTION:Tu présentes les résultats du trimestre au projecteur. Support : resultats_q4.pptx (PowerPoint)\, chiffres dans budget_q4.xlsx.
+DESCRIPTION:Tu présentes les résultats du trimestre au projecteur. Support : resultats_q4.pptx.
 END:VEVENT
 BEGIN:VEVENT
-UID:preflight-workshop-20261123@lauzhack
-ATTENDEE;CN=Équipe sécurité IT;ROLE=REQ-PARTICIPANT:mailto:équipe@lemanic.example
+UID:pf-train-23@lauzhack
+DTSTAMP:20261122T000000Z
+DTSTART;TZID=Europe/Zurich:20261123T133000
+DTEND;TZID=Europe/Zurich:20261123T150000
+SUMMARY:Train Lausanne → Zurich (travail hors ligne)
+LOCATION:CFF
+DESCRIPTION:Relire le rapport dans le train : peu de réseau\, pas toujours de prise.
+END:VEVENT
+BEGIN:VEVENT
+UID:pf-workshop-23@lauzhack
+ATTENDEE;CN=Equipe securite IT;ROLE=REQ-PARTICIPANT:mailto:equipe@lemanic.example
 ATTENDEE;CN=Hamza Zoubayri;ROLE=REQ-PARTICIPANT:mailto:hamza@lemanic.example
 DTSTAMP:20261122T000000Z
-DTSTART;TZID=Europe/Zurich:20261123T140000
-DTEND;TZID=Europe/Zurich:20261123T160000
+DTSTART;TZID=Europe/Zurich:20261123T160000
+DTEND;TZID=Europe/Zurich:20261123T170000
 SUMMARY:Workshop sécurité informatique
 LOCATION:Salle BC 01
-DESCRIPTION:Atelier pratique sur ton laptop (2 h\, peu de prises dans la salle). Lien du support en ligne : https://moodle.epfl.ch/
-END:VEVENT
-BEGIN:VEVENT
-UID:preflight-1on1-20261123@lauzhack
-ATTENDEE;CN=Sarah Keller;ROLE=REQ-PARTICIPANT:mailto:sarah@lemanic.example
-ATTENDEE;CN=Hamza Zoubayri;ROLE=REQ-PARTICIPANT:mailto:hamza@lemanic.example
-DTSTAMP:20261122T000000Z
-DTSTART;TZID=Europe/Zurich:20261123T163000
-DTEND;TZID=Europe/Zurich:20261123T170000
-SUMMARY:1:1 avec Sarah
-LOCATION:Zoom
-DESCRIPTION:Point hebdo : retour sur le comité de ce matin.\nZoom : https://epfl.zoom.us/j/123456789
+DESCRIPTION:Atelier pratique sur ton laptop.
 END:VEVENT
 END:VCALENDAR

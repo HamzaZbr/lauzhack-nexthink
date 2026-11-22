@@ -34,10 +34,27 @@ export function appsFor(blob: string, link?: string): string[] {
   if (/excel|\.xlsx|tableur/i.test(blob)) apps.add("Excel");
   if (/powerpoint|\.pptx|slides/i.test(blob)) apps.add("PowerPoint");
   if (/\bword\b|\.docx/i.test(blob)) apps.add("Word");
+  if (/antigravity/i.test(blob)) apps.add("Antigravity");
+  if (/vs ?code|visual studio code/i.test(blob)) apps.add("Visual Studio Code");
   return [...apps];
 }
 
-/** Transforme un .ics en blocs « meeting » pour la journée `day`. `mapToToday` : ignore la date (calendrier de démo). */
+/** Sites utiles cités dans l'événement (hors lien de visio) : leurs onglets sont gardés, mis devant ou ouverts. */
+export function sitesOf(blob: string, link?: string): string[] {
+  const hosts = (blob.match(/https?:\/\/[^\s"<>]+/g) ?? [])
+    .filter((u) => u !== link)
+    .map((u) => {
+      try {
+        return new URL(u).hostname.replace(/^www\./, "");
+      } catch {
+        return "";
+      }
+    })
+    .filter((h) => h && !/zoom\.us|teams\.microsoft|webex|meet\.google/.test(h));
+  return [...new Set(hosts)].slice(0, 3);
+}
+
+/** Transforme un .ics en blocs (meetings et blocs de travail) pour la journée `day`. `mapToToday` : ignore la date (calendrier de démo). */
 export function icsToBlocks(ics: string, day: Date, mapToToday = false): DayBlock[] {
   const data = ical.sync.parseICS(ics);
   const from = new Date(day.getFullYear(), day.getMonth(), day.getDate(), 0, 0, 0);
@@ -62,9 +79,11 @@ export function icsToBlocks(ics: string, day: Date, mapToToday = false): DayBloc
         start: hhmm(inst.start),
         end: hhmm(inst.end),
         title: text(inst.ev.summary).slice(0, 60) || "(sans titre)",
-        kind: "meeting",
+        // Un événement avec un lien de visio ou des participants est un meeting ; sinon, un bloc de travail que tu t'es réservé.
+        kind: link || attendeesOf((inst.ev as unknown as { attendee?: unknown }).attendee).length >= 2 ? "meeting" : "focus",
         source: "calendar",
         apps: appsFor(blob, link),
+        sites: sitesOf(blob, link),
         link,
         docs: [...new Set((blob.match(/[\w.-]+\.(xlsx|xls|csv|docx|doc|pptx|ppt|key|pages|numbers|pdf)\b/gi) ?? []).map((f) => f.replace(/\.[a-z]+$/i, "")))].slice(0, 3),
         location: text(inst.ev.location).trim().slice(0, 120) || undefined,

@@ -225,6 +225,9 @@ export interface PreflightApi {
   /** Mascotte : clic (brief ou tableau de bord) et menu (clic droit). */
   mascotClick(): Promise<void>;
   mascotMenu(): Promise<void>;
+  /** Glisser la mascotte : début, puis décalage en pixels depuis le début. */
+  mascotDragStart(): void;
+  mascotDrag(dx: number, dy: number): void;
   /** Raccourcis : définitions, activés, routines repérées dans le journal d'usage (démo). */
   shortcuts(): Promise<ShortcutsState>;
   toggleShortcut(id: string, on: boolean): Promise<{ enabled: string[]; conflict?: string }>;

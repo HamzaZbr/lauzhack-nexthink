@@ -32,7 +32,7 @@ export function nextBlock(): DayBlock | null {
   return startingSoon ?? upcoming[0] ?? null;
 }
 
-const HEAVY_MB = 500;
+const HEAVY_MB = 300; // une app sans rapport avec le bloc qui prend plus de 300 Mo de RAM est proposée à la fermeture
 
 
 export async function planPreflight(): Promise<PreflightPlan> {

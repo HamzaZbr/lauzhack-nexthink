@@ -6,7 +6,7 @@ import { app, ipcMain, Menu, Tray } from "electron";
 import { join } from "node:path";
 import { config as loadEnv } from "dotenv";
 import { hasKey, model, ping } from "./llm";
-import { closePopup, hideMascot, openPopup, setPopupListener, showDashboard, showMascot, toDashboard, toMascot } from "./windows";
+import { closePopup, hideMascot, mascotDragMove, mascotDragStart, openPopup, setPopupListener, showDashboard, showMascot, toDashboard, toMascot } from "./windows";
 import { catalog, getJournal, initJournal, runActions, undo } from "./actions";
 import { planPreflight } from "./planner";
 import { readDisplays, takeSnapshot } from "./sensors";
@@ -68,6 +68,10 @@ function registerIpc() {
       showDashboard();
       toMascot("happy", "Voilà ta journée.");
     }
+  });
+  ipcMain.on("mascot:drag-start", () => mascotDragStart());
+  ipcMain.on("mascot:drag", (_e, dx: number, dy: number) => {
+    if (Number.isFinite(dx) && Number.isFinite(dy)) mascotDragMove(dx, dy);
   });
   ipcMain.handle("mascot:menu", () => {
     Menu.buildFromTemplate([

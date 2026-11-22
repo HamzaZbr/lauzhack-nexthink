@@ -1,37 +1,47 @@
-# Preflight — LauzHack 2026 · challenge Nexthink
+# Sparky 🐶
 
-> Objectif et avancement : [PROJET.md](PROJET.md) · Bien utiliser et tester : [GUIDE.md](GUIDE.md) · Comment ça marche : [ARCHITECTURE.md](ARCHITECTURE.md)
+> **Laptop not ready when you are? Sparky is.** Your AI dog for a frictionless workday.
 
-Un agent IT qui prépare ta journée : il lit ton calendrier, te demande le matin ce que tu fais en plus,
-prépare ton Mac 5 min avant chaque bloc (en demandant avant d'agir) et place la maintenance dans tes créneaux libres.
+![Sparky](docs/sparky-cover.png)
 
-## Lancer
+Built in one weekend, solo, for **LauzHack 2026 · Nexthink challenge** (*an AI that makes tech at work less painful*).
+
+## What it does
+
+Most tech pain at work isn't a crash: it's the minutes lost before every block of your day. Sparky is a little dog peeking over the edge of your screen that fixes this **before** it happens, driven by your calendar.
+
+| When | What Sparky does |
+|---|---|
+| **Morning** | You tell it your day in one sentence; an LLM fits your tasks between your calendar's meetings. Tells you what to take with you (HDMI adapter, charger). |
+| **5 min before each block** (meeting *or* focus block) | Checks the Mac against what the block needs (external screen when you present, Wi-Fi, battery), closes heavy apps and tabs you don't need (LLM triage + guardrails that always keep work sites), opens what you do: Zoom directly, the right document, the right GitHub tab, meeting notes pre-filled from the invite. |
+| **Free slot** | "Grab a coffee, I'm tidying up your Mac": measures and cleans rebuildable caches (npm, pip, Homebrew, Gradle, Xcode, Spotify), old downloads to the Trash. |
+| **Any time** | Repeated click routines become one-key shortcuts (⌃⌥P / ⌃⌥R / ⌃⌥T / ⌃⌥N) that open company templates and meeting notes. |
+| **6 pm** | Sums up the day (time saved, GB freed, issues caught), what's left for tomorrow, and what to pack. |
+
+## Safety first: it acts, never without you
+
+- **The AI proposes, the code checks, you approve.** The LLM only returns JSON; it never runs a command.
+- Every action has a **risk level**: `auto` (read-only checks), `1 click` (ticked, runs only when you click), `ask` (unticked, you must choose).
+- Everything is **logged with its reason** and can be **undone** (apps and tabs reopen, files go to the Trash).
+- **Simulation by default** (`PREFLIGHT_DRY_RUN=1`). No shell: commands run with `execFile` and separate arguments; closed lists of cache folders, URL schemes and file types.
+
+## What's real, what's simulated
+
+Real on the Mac: sensors, calendar (.ics / Outlook link), LLM brief and tab triage, quitting apps, closing tabs, opening Zoom/documents/templates, cache cleanup, undo, journal.
+Simulated: the usage log behind the shortcuts (demo data), the macOS update, and "time saved" (an estimate, with its assumptions shown in the app).
+
+## Run it (macOS)
 
 ```bash
 npm install
-cp .env.example .env    # puis mets ta clé TOGETHER_API_KEY
-npm run dev
+cp .env.example .env    # add your Together AI key
+npm run dev             # only Sparky shows up, bottom-right
+npm run demo:tabs       # optional: a Chrome window of demo tabs
 ```
 
-- Le dashboard s'ouvre, le brief du matin aussi. L'icône dans la barre de menu ouvre les pop-ups de test.
-- Bouton **Tester le LLM** en bas de la sidebar : vérifie la clé, le modèle et le mode JSON.
-- `npm run typecheck` pour vérifier les types, `npm run build` pour construire.
+## How it's built
 
-## Structure
+Electron + React + TypeScript (electron-vite), Together AI (OpenAI-compatible API, strict JSON schema), node-ical, framer-motion.
+`src/main` = the brain (scheduler, planner, LLM agent, action registry, sensors) · `src/renderer` = dashboard, pop-ups and Sparky · `src/shared` = pure, testable logic.
 
-```
-src/main/        process principal : fenêtres, barre de menu, IPC, LLM (llm.ts), horloge démo (clock.ts)
-src/preload/     pont sécurisé entre l'UI et le main (window.api)
-src/shared/      types partagés + données de démo (mock.ts)
-src/renderer/    l'UI React (design repris de Contagion)
-  src/views/     Aujourd'hui · Mon PC (arbre « pourquoi ») · Journal · Semaine
-  src/popup/     brief du matin · pre-flight · pause café
-```
-
-## Règles du projet
-
-- Le LLM **propose** un plan en JSON ; le code vérifie que chaque action existe dans le catalogue et applique son niveau de risque.
-- Risques : `auto` (lecture seule) · `confirm` (réversible, 1 clic) · `ask` (toujours demander).
-- Chaque action est journalisée et, si possible, annulable.
-- Par défaut `PREFLIGHT_DRY_RUN=1` : les actions sont simulées. Mets `PREFLIGHT_DRY_RUN=0` dans `.env` pour agir pour de vrai.
-- Au premier pre-flight, macOS demande d’autoriser l’app à contrôler Chrome (onglets) : accepte.
+More (in French): [PROJET.md](PROJET.md) · [ARCHITECTURE.md](ARCHITECTURE.md) · [GUIDE.md](GUIDE.md)
