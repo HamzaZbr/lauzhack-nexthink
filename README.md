@@ -4,7 +4,9 @@
 
 ![Sparky](docs/sparky-cover.png)
 
-Built in one weekend, solo, for **LauzHack 2026 · Nexthink challenge** (*an AI that makes tech at work less painful*).
+Built solo in one weekend (21–22 November 2026) at **[LauzHack 2026](https://lauzhack.com)**, EPFL's hackathon, for the **Nexthink challenge**: *an AI that makes tech at work less painful*.
+
+🏆 **Top 4 in the Nexthink track**. The jury added this spot to recognise a project built by a single person.
 
 ## What it does
 
@@ -44,4 +46,6 @@ npm run demo:tabs       # optional: a Chrome window of demo tabs
 Electron + React + TypeScript (electron-vite), Together AI (OpenAI-compatible API, strict JSON schema), node-ical, framer-motion.
 `src/main` = the brain (scheduler, planner, LLM agent, action registry, sensors) · `src/renderer` = dashboard, pop-ups and Sparky · `src/shared` = pure, testable logic.
 
-More (in French): [PROJET.md](PROJET.md) · [ARCHITECTURE.md](ARCHITECTURE.md) · [GUIDE.md](GUIDE.md)
+Full documentation (architecture, safety model, LLM benchmark, configuration, troubleshooting): **[docs/DOCUMENTATION.md](docs/DOCUMENTATION.md)**.
+
+> The app's interface is in French. The project started as *Preflight*, hence the `PREFLIGHT_*` settings.
